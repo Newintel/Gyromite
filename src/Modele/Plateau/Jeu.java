@@ -8,7 +8,7 @@ import Modele.Plateau.Objets.*;
 
 public class Jeu {
     public static final int SIZE_X = 20;
-    public static final int SIZE_Y = 10;
+    public static final int SIZE_Y = 20;
 
     // compteur de déplacements horizontal et vertical (1 max par défaut, à chaque pas de temps)
     private HashMap<Entite, Integer> cmptDeplH = new HashMap<Entite, Integer>();
@@ -37,10 +37,14 @@ public class Jeu {
 
     private void initialisationDesEntites() {
         hector = new Heros(this);
-        addEntite(hector, 2, 1);
+        addEntite(hector, 5, 5);
 
         Gravite g = new Gravite();
         g.addEntiteDynamique(hector);
+        ordonnanceur.add(g);
+        
+        Controle4Directions.getInstance().addEntiteDynamique(hector);
+        ordonnanceur.add(Controle4Directions.getInstance());
         
         for(int x = 0; x < SIZE_X; x++){
             addEntite(new Mur(this), x, 0);
@@ -52,10 +56,7 @@ public class Jeu {
             addEntite(new Mur(this), SIZE_X - 1, y);
         }
 
-        ordonnanceur.add(g);
-
-        Controle4Directions.getInstance().addEntiteDynamique(hector);
-        ordonnanceur.add(Controle4Directions.getInstance());
+        addEntite(new Mur(this), 5, 6);
     }
 
     private boolean contenuDansGrille(Point p){

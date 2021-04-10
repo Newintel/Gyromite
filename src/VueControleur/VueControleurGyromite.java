@@ -12,6 +12,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.plaf.DimensionUIResource;
 
 import Modele.Deplacements.Controle4Directions;
 import Modele.Deplacements.Direction;
@@ -43,11 +44,12 @@ public class VueControleurGyromite extends JFrame implements Observer {
         chargerLesIcones();
         placerLesComposantsGraphiques();
         ajouterEcouteurClavier();
+        setResizable(false);
     }
 
     private void placerLesComposantsGraphiques() {
         setTitle("Gyromite");
-        setSize(400, 250);
+        setSize(18 * sizeX, 19 * sizeY);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // permet de terminer l'application à la fermeture de la fenêtre
 
         JComponent grilleJLabels = new JPanel(new GridLayout(sizeY, sizeX)); // grilleJLabels va contenir les cases graphiques et les positionner sous la forme d'une grille
