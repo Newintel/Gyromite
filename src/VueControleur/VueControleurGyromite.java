@@ -82,7 +82,14 @@ public class VueControleurGyromite extends JFrame implements Observer {
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++){
                 if (jeu.getGrille()[x][y] instanceof Heros){
-                    int d = ((Heros) jeu.getGrille()[x][y]).vaADroite() ? 1 : 0;
+                    int d;
+
+                    if (((Heros) jeu.getGrille()[x][y]).monteOuDescend())
+                        d = 2;
+                    else if (((Heros) jeu.getGrille()[x][y]).vaADroite())
+                        d = 1;
+                    else d = 0;
+
                     tabJLabel[x][y].setIcon(icoHero[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Bot){
 

@@ -41,13 +41,16 @@ public class Jeu {
 
         Gravite g = new Gravite();
         g.addEntiteDynamique(hector);
-
-        for(int x = 0; x < 20; x++){
-            // addEntite(new Mur(this), x, 0);
-            addEntite(new Mur(this), x, 9);
+        
+        for(int x = 0; x < SIZE_X; x++){
+            addEntite(new Mur(this), x, 0);
+            addEntite(new Mur(this), x, SIZE_Y - 1);
         }
 
-        // addEntite(new Mur(this), 2, 0);
+        for (int y = 1; y < SIZE_Y - 1; y++){
+            addEntite(new Mur(this), 0, y);
+            addEntite(new Mur(this), SIZE_X - 1, y);
+        }
 
         ordonnanceur.add(g);
 
@@ -73,8 +76,8 @@ public class Jeu {
         Point ret = null;
 
         switch (d){
-            case haut: ret = new Point(pCourant.x, pCourant.y + 1); break;
-            case bas: ret = new Point(pCourant.x, pCourant.y - 1); break;
+            case haut: ret = new Point(pCourant.x, pCourant.y - 1); break;
+            case bas: ret = new Point(pCourant.x, pCourant.y + 1); break;
             case droite: ret = new Point(pCourant.x + 1, pCourant.y); break;
             case gauche: ret = new Point(pCourant.x - 1, pCourant.y); break;
         }
@@ -89,22 +92,42 @@ public class Jeu {
         Point pCible = calculerPointCible(pCourant, d);
 
         if (contenuDansGrille(pCible))
-            if (ObjetALaPosition(pCible) == null){ // TODO: penser aux collisions
+            if (ObjetALaPosition(pCible) == null || ObjetALaPosition(pCible).peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
                 switch (d){
                     case haut:
                     case bas:
-                        cmptDeplV.put(e, 1);
-                        ret = true;
+                        if (cmptDeplV.get(e) == null){
+                            cmptDeplV.put(e, 1);
+                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre()) ((Personnage) e).sePoseOuMonte();
+                            ret = true;
+                        }
                         break;
                     case gauche:
                     case droite:
-                        cmptDeplH.put(e, 1);
-                        ret = true;
+                        if (cmptDeplH.get(e) == null){
+                            cmptDeplH.put(e, 1);
+                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && !ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && ((Personnage) e).monteOuDescend()) ((Personnage) e).sePoseOuMonte();
+                            ret = true;
+                        }
                         break;
                 }
             }
 
+            if (ret){
+                if (e instanceof Personnage && ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && d.getValue() > 1)
+                    ((Personnage) e).sePoseOuMonte();
+                else if (((Personnage) e).vaADroite() && d == Direction.gauche || !((Personnage) e).vaADroite() && d == Direction.droite)
+                    ((Personnage) e).seTourne();
+                deplacerEntite(pCourant, pCible, e);
+            }
+
         return ret;
+    }
+
+    private void deplacerEntite(Point pCourant, Point pCible, Entite e){
+        grilleEntites[pCourant.x][pCourant.y] = null;
+        grilleEntites[pCible.x][pCible.y] = e;
+        map.put(e, pCible);
     }
 
     public Entite regarderDansLaDirection(Entite e, Direction d){
