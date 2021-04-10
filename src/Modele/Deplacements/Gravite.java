@@ -5,20 +5,20 @@ import Modele.Plateau.EntiteDynamique;
 
 public class Gravite extends RealisateurDeDeplacement {
 
-    private Direction sens;
+    // private Direction sens;
 
-    public Gravite(boolean inv){
-        sens = inv ? Direction.haut : Direction.bas;
-    }
+    // public Gravite(boolean inv){
+    //     sens = inv ? Direction.haut : Direction.bas;
+    // }
 
     @Override
     public boolean realiserDeplacement(){
         boolean ret = false;
 
         for (EntiteDynamique e : listEntitesDynamiques){
-            Entite b = e.regarderDansLaDirection(sens);
-            if (b == null || !b.peutServirDeSupport())
-                if (e.avancerDirectionChoisie(sens))
+            Entite b = e.regarderDansLaDirection(Direction.bas);
+            if (b == null || (b != null && !b.peutServirDeSupport()))
+                if (e.avancerDirectionChoisie(Direction.bas))
                     ret = true;
         }
 

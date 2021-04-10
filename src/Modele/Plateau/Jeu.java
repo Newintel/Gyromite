@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.awt.Point;
 import Modele.Deplacements.*;
 import Modele.Plateau.Personnages.*;
+import Modele.Plateau.Objets.*;
 
 public class Jeu {
     public static final int SIZE_X = 20;
@@ -38,8 +39,15 @@ public class Jeu {
         hector = new Heros(this);
         addEntite(hector, 2, 1);
 
-        Gravite g = new Gravite(false);
+        Gravite g = new Gravite();
         g.addEntiteDynamique(hector);
+
+        for(int x = 0; x < 20; x++){
+            // addEntite(new Mur(this), x, 0);
+            addEntite(new Mur(this), x, 9);
+        }
+
+        // addEntite(new Mur(this), 2, 0);
 
         ordonnanceur.add(g);
 
@@ -114,5 +122,9 @@ public class Jeu {
 
     public Heros getHector(){
         return hector;
+    }
+
+    public void start(long _pause){
+        ordonnanceur.start(_pause);
     }
 }

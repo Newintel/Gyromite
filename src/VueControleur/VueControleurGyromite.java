@@ -27,7 +27,8 @@ public class VueControleurGyromite extends JFrame implements Observer {
     private int sizeY;
 
     // icones affichées dans la grille
-    private ImageIcon icoHero;
+    private ImageIcon[] icoHero;
+    private ImageIcon[] bot;
     private ImageIcon icoVide;
     private ImageIcon icoMur;
     private ImageIcon icoColonne;
@@ -39,7 +40,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
         sizeY = _jeu.SIZE_Y;
         jeu = _jeu;
 
-        // chargerLesIcones();
+        chargerLesIcones();
         placerLesComposantsGraphiques();
         ajouterEcouteurClavier();
     }
@@ -81,19 +82,18 @@ public class VueControleurGyromite extends JFrame implements Observer {
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++){
                 if (jeu.getGrille()[x][y] instanceof Heros){
-
+                    int d = ((Heros) jeu.getGrille()[x][y]).vaADroite() ? 1 : 0;
+                    tabJLabel[x][y].setIcon(icoHero[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Bot){
 
                 } else if (jeu.getGrille()[x][y] instanceof Colonne){
-                    if (((Colonne) jeu.getGrille()[x][y]).estBleue()){
-
-                    } else {
-
-                    }
+                    tabJLabel[x][y].setIcon(icoColonne);
                 } else if (jeu.getGrille()[x][y] instanceof Mur){
-
+                    tabJLabel[x][y].setIcon(icoMur);
                 } else if (jeu.getGrille()[x][y] instanceof Corde){
 
+                } else {
+                    tabJLabel[x][y].setIcon(icoVide);
                 }
             }
     }
@@ -109,6 +109,13 @@ public class VueControleurGyromite extends JFrame implements Observer {
         }
 
         return new ImageIcon(image);
+    }
+
+    public void chargerLesIcones(){
+        icoHero = new ImageIcon[]{chargerIcone("Images/Player/Left.png"), chargerIcone("Images/Player/Right.png")};
+        icoColonne = chargerIcone("Images/Colonne.png");
+        icoMur = chargerIcone("Images/Mur.png");
+        icoVide = chargerIcone("Images/Vide.png");
     }
 
     @Override
