@@ -1,7 +1,7 @@
 package Modele.Deplacements;
 import Modele.Plateau.*;
 
-public class Controle4Directions extends RealisateurDeDeplacement {
+public class Controle4Directions extends RealisateurDeDeplacement<EntiteDynamique> {
     private Direction directionCourante;
     // Design pattern singleton
     private static Controle4Directions c3d;

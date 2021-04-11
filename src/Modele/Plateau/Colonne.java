@@ -8,6 +8,8 @@ public class Colonne extends EntiteDynamique{
         super(_jeu);
         bleu = estBleu;
         enBas = estEnBas;
+
+        //TODO: gestion des parties de colonnes + colonne holder
     }
 
     public boolean peutServirDeSupport() { return true; }
@@ -17,5 +19,5 @@ public class Colonne extends EntiteDynamique{
     public boolean estBleue() {return bleu;}
 
     public boolean estEnBas() { return enBas; }
-    public void monterDescendre(){}
+    public void monterDescendre(){ enBas = !enBas; }
 }

@@ -1,15 +1,13 @@
 package Modele.Deplacements;
 
-import Modele.Plateau.EntiteDynamique;
-
 import java.util.ArrayList;
 
 /**
 Tous les déplacement sont déclenchés par cette classe (gravité, controle clavier, IA, etc.)
  */
-public abstract class RealisateurDeDeplacement {
-    protected ArrayList<EntiteDynamique> listEntitesDynamiques = new ArrayList<EntiteDynamique>();
+public abstract class RealisateurDeDeplacement<T> {
+    protected ArrayList<T> listEntitesDynamiques = new ArrayList<T>();
     protected abstract boolean realiserDeplacement();
 
-    public void addEntiteDynamique(EntiteDynamique ed) {listEntitesDynamiques.add(ed);}
+    public void addEntiteDynamique(T ed) {listEntitesDynamiques.add(ed);}
 }

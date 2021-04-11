@@ -3,7 +3,7 @@ package Modele.Deplacements;
 import Modele.Plateau.Entite;
 import Modele.Plateau.EntiteDynamique;
 
-public class Gravite extends RealisateurDeDeplacement {
+public class Gravite extends RealisateurDeDeplacement<EntiteDynamique> {
 
     // private Direction sens;
 
