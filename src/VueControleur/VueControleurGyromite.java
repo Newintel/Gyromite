@@ -16,6 +16,8 @@ import javax.swing.*;
 import javax.swing.plaf.DimensionUIResource;
 
 import Modele.Deplacements.Controle4Directions;
+import Modele.Deplacements.ControleColonneRouge;
+import Modele.Deplacements.ControleColonneBleue;
 import Modele.Deplacements.Direction;
 import Modele.Plateau.*;
 
@@ -31,6 +33,10 @@ public class VueControleurGyromite extends JFrame implements Observer {
     private ImageIcon[] icoBot;
     private ImageIcon[] icoMur;
     private ImageIcon[] icoColonne;
+    private ImageIcon icoCorde;
+    private ImageIcon[] icoHolder;
+    private ImageIcon icoRadis;
+    private ImageIcon icoDynamite;
 
     private JLabel[][] tabJLabel; // cases graphique (au moment du rafraichissement, chaque case va être associée à une icône, suivant ce qui est présent dans le modèle)
 
@@ -75,9 +81,9 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     case KeyEvent.VK_RIGHT : Controle4Directions.getInstance().setDirectionCourante(Direction.droite); break;
                     case KeyEvent.VK_DOWN : Controle4Directions.getInstance().setDirectionCourante(Direction.bas); break;
                     case KeyEvent.VK_UP : Controle4Directions.getInstance().setDirectionCourante(Direction.haut); break;
-                    case KeyEvent.VK_C : break;
-                    case KeyEvent.VK_D : break;
-                    case KeyEvent.VK_F : break;
+                    case KeyEvent.VK_C : break; // Attraper radis
+                    case KeyEvent.VK_D : ControleColonneBleue.getInstance().ouvrirFermer(); break;
+                    case KeyEvent.VK_F : ControleColonneRouge.getInstance().ouvrirFermer(); break; // Colonnes rouges
                 }
             }
         });
@@ -109,7 +115,12 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     int d = ((Mur) jeu.getGrille()[x][y]).estVertical() ? 1 : 0;
                     tabJLabel[x][y].setIcon(icoMur[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Corde){
-
+                    tabJLabel[x][y].setIcon(icoCorde);
+                } else if (jeu.getGrille()[x][y] instanceof Holder){
+                    int d = ((Holder) jeu.getGrille()[x][y]).droite() ? 1 : 0;
+                    tabJLabel[x][y].setIcon(icoHolder[d]);
+                } else if (jeu.getGrille()[x][y] instanceof Dynamite){
+                    tabJLabel[x][y].setIcon(icoDynamite);
                 } else {
                     tabJLabel[x][y].setIcon(null);
                 }
@@ -145,6 +156,12 @@ public class VueControleurGyromite extends JFrame implements Observer {
             chargerIcone("Images/Evt/mur_horizontal.png"), 
             chargerIcone("Images/Evt/mur_vertical.png")
         };
+        icoCorde = chargerIcone("Images/Evt/corde.png");
+        icoHolder = new ImageIcon[]{
+            chargerIcone("Images/Evt/pilier_holder_gauche.png"),
+            chargerIcone("Images/Evt/pilier_holder_droite.png")
+        };
+        icoDynamite = chargerIcone("Images/Entites/bombe.png");
     }
 
     @Override

@@ -1,6 +1,6 @@
 package Modele.Deplacements;
 
-public class ControleColonneBleue extends ControleColonne{
+public class ControleColonneRouge extends ControleColonne {
     private static ControleColonneBleue cc;
 
     public static ControleColonneBleue getInstance(){

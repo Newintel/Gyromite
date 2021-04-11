@@ -1,5 +1,6 @@
 package Modele.Plateau;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.awt.Point;
 import Modele.Deplacements.*;
@@ -54,6 +55,18 @@ public class Jeu {
             addEntite(new Mur(this, true), SIZE_X - 1, y);
         }
 
+        ArrayList<Colonne> cb1 = new ArrayList<Colonne>(); 
+        for (int i = 5; i < 11; i++){
+            Colonne toAdd = new Colonne(this, false);
+            cb1.add(toAdd);
+            addEntite(toAdd, 10, i);
+        }
+
+        addEntite(new Holder(this, false), 9, 10);
+
+        ControleColonneRouge.getInstance().addEntiteDynamique(cb1);
+        ordonnanceur.add(ControleColonneRouge.getInstance());
+
         addEntite(new Mur(this, false), 5, 6);
     }
 
@@ -97,7 +110,8 @@ public class Jeu {
                     case bas:
                         if (cmptDeplV.get(e) == null){
                             cmptDeplV.put(e, 1);
-                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre()) ((Personnage) e).sePoseOuMonte();
+                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre())
+                                ((Personnage) e).sePoseOuMonte();
                             ret = true;
                         }
                         break;
@@ -105,7 +119,8 @@ public class Jeu {
                     case droite:
                         if (cmptDeplH.get(e) == null){
                             cmptDeplH.put(e, 1);
-                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && !ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && ((Personnage) e).monteOuDescend()) ((Personnage) e).sePoseOuMonte();
+                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && !ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && ((Personnage) e).monteOuDescend())
+                                ((Personnage) e).sePoseOuMonte();
                             ret = true;
                         }
                         break;
