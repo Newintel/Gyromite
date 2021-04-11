@@ -3,8 +3,6 @@ package Modele.Plateau;
 import java.util.HashMap;
 import java.awt.Point;
 import Modele.Deplacements.*;
-import Modele.Plateau.Personnages.*;
-import Modele.Plateau.Objets.*;
 
 public class Jeu {
     public static final int SIZE_X = 20;
@@ -37,7 +35,7 @@ public class Jeu {
 
     private void initialisationDesEntites() {
         hector = new Heros(this);
-        addEntite(hector, 5, 5);
+        addEntite(hector, 5, 4);
 
         Gravite g = new Gravite();
         g.addEntiteDynamique(hector);
@@ -47,16 +45,16 @@ public class Jeu {
         ordonnanceur.add(Controle4Directions.getInstance());
         
         for(int x = 0; x < SIZE_X; x++){
-            addEntite(new Mur(this), x, 0);
-            addEntite(new Mur(this), x, SIZE_Y - 1);
+            addEntite(new Mur(this, false), x, 0);
+            addEntite(new Mur(this, false), x, SIZE_Y - 1);
         }
 
         for (int y = 1; y < SIZE_Y - 1; y++){
-            addEntite(new Mur(this), 0, y);
-            addEntite(new Mur(this), SIZE_X - 1, y);
+            addEntite(new Mur(this, true), 0, y);
+            addEntite(new Mur(this, true), SIZE_X - 1, y);
         }
 
-        addEntite(new Mur(this), 5, 6);
+        addEntite(new Mur(this, false), 5, 6);
     }
 
     private boolean contenuDansGrille(Point p){
@@ -115,10 +113,17 @@ public class Jeu {
             }
 
             if (ret){
-                if (e instanceof Personnage && ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && d.getValue() > 1)
-                    ((Personnage) e).sePoseOuMonte();
-                else if (((Personnage) e).vaADroite() && d == Direction.gauche || !((Personnage) e).vaADroite() && d == Direction.droite)
-                    ((Personnage) e).seTourne();
+                if (e instanceof Personnage){
+                    if (ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && d.getValue() > 1)
+                        ((Personnage) e).sePoseOuMonte();
+                    else if (((Personnage) e).vaADroite() && d == Direction.gauche || !((Personnage) e).vaADroite() && d == Direction.droite)
+                        ((Personnage) e).seTourne();
+                    
+                    if (e instanceof Heros)
+                        if (ObjetALaPosition(pCible) instanceof Dynamite)
+                            ((Heros) e).attraperDynamite();
+                }
+
                 deplacerEntite(pCourant, pCible, e);
             }
 

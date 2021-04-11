@@ -1,5 +1,6 @@
 package VueControleur;
 
+import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -17,8 +18,6 @@ import javax.swing.plaf.DimensionUIResource;
 import Modele.Deplacements.Controle4Directions;
 import Modele.Deplacements.Direction;
 import Modele.Plateau.*;
-import Modele.Plateau.Personnages.*;
-import Modele.Plateau.Objets.*;
 
 
 public class VueControleurGyromite extends JFrame implements Observer {
@@ -29,10 +28,9 @@ public class VueControleurGyromite extends JFrame implements Observer {
 
     // icones affichées dans la grille
     private ImageIcon[] icoHero;
-    private ImageIcon[] bot;
-    private ImageIcon icoVide;
-    private ImageIcon icoMur;
-    private ImageIcon icoColonne;
+    private ImageIcon[] icoBot;
+    private ImageIcon[] icoMur;
+    private ImageIcon[] icoColonne;
 
     private JLabel[][] tabJLabel; // cases graphique (au moment du rafraichissement, chaque case va être associée à une icône, suivant ce qui est présent dans le modèle)
 
@@ -59,6 +57,8 @@ public class VueControleurGyromite extends JFrame implements Observer {
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
                 JLabel jlab = new JLabel();
+                jlab.setOpaque(true);
+                jlab.setBackground(Color.BLUE);
                 tabJLabel[x][y] = jlab; // on conserve les cases graphiques dans tabJLabel pour avoir un accès pratique à celles-ci (voir mettreAJourAffichage() )
                 grilleJLabels.add(jlab);
             }
@@ -83,26 +83,32 @@ public class VueControleurGyromite extends JFrame implements Observer {
     private void mettreAJourAffichage(){
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++){
-                if (jeu.getGrille()[x][y] instanceof Heros){
+                if (jeu.getGrille()[x][y] instanceof Personnage){
                     int d;
 
-                    if (((Heros) jeu.getGrille()[x][y]).monteOuDescend())
+                    if (((Personnage) jeu.getGrille()[x][y]).monteOuDescend())
                         d = 2;
-                    else if (((Heros) jeu.getGrille()[x][y]).vaADroite())
+                    else if (((Personnage) jeu.getGrille()[x][y]).vaADroite())
                         d = 1;
                     else d = 0;
 
-                    tabJLabel[x][y].setIcon(icoHero[d]);
-                } else if (jeu.getGrille()[x][y] instanceof Bot){
+                    if (jeu.getGrille()[x][y] instanceof Heros)
+                        if (((Heros) jeu.getGrille()[x][y]).aUnRadis())
+                            d += 3;
 
+                    ImageIcon[] icones = jeu.getGrille()[x][y] instanceof Heros ? icoHero : icoBot;
+
+                    tabJLabel[x][y].setIcon(icones[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Colonne){
-                    tabJLabel[x][y].setIcon(icoColonne);
+                    int d = ((Colonne) jeu.getGrille()[x][y]).estBleue() ? 0 : 1;
+                    tabJLabel[x][y].setIcon(icoColonne[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Mur){
-                    tabJLabel[x][y].setIcon(icoMur);
+                    int d = ((Mur) jeu.getGrille()[x][y]).estVertical() ? 1 : 0;
+                    tabJLabel[x][y].setIcon(icoMur[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Corde){
 
                 } else {
-                    tabJLabel[x][y].setIcon(icoVide);
+                    tabJLabel[x][y].setIcon(null);
                 }
             }
     }
@@ -121,10 +127,21 @@ public class VueControleurGyromite extends JFrame implements Observer {
     }
 
     public void chargerLesIcones(){
-        icoHero = new ImageIcon[]{chargerIcone("Images/Player/Left.png"), chargerIcone("Images/Player/Right.png")};
-        icoColonne = chargerIcone("Images/Colonne.png");
-        icoMur = chargerIcone("Images/Mur.png");
-        icoVide = chargerIcone("Images/Vide.png");
+        icoHero = new ImageIcon[]{
+            chargerIcone("Images/Entites/player_left.png"),
+            chargerIcone("Images/Entites/player_right.png"),
+            chargerIcone("Images/Entites/player_monte.png"),
+            chargerIcone("Images/Entites/player_left_radis.png"), 
+            chargerIcone("Images/Entites/player_right_radis.png")
+        };
+        icoColonne = new ImageIcon[]{
+            chargerIcone("Images/Evt/pilier_bleu.png"), 
+            chargerIcone("Images/Evt/pilier_rouge.png")
+        };
+        icoMur = new ImageIcon[]{
+            chargerIcone("Images/Evt/mur_horizontal.png"), 
+            chargerIcone("Images/Evt/mur_vertical.png")
+        };
     }
 
     @Override

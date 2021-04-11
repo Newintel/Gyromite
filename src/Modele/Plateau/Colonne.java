@@ -1,14 +1,13 @@
-package Modele.Plateau.Objets;
-
-import Modele.Plateau.EntiteDynamique;
-import Modele.Plateau.Jeu;
+package Modele.Plateau;
 
 public class Colonne extends EntiteDynamique{
     private boolean bleu;
+    private boolean enBas;
 
-    public Colonne(Jeu _jeu, boolean estBleu){
+    public Colonne(Jeu _jeu, boolean estBleu, boolean estEnBas){
         super(_jeu);
         bleu = estBleu;
+        enBas = estEnBas;
     }
 
     public boolean peutServirDeSupport() { return true; }
@@ -16,4 +15,7 @@ public class Colonne extends EntiteDynamique{
     public boolean peutPermettreDeMonterDescendre() { return false; }
 
     public boolean estBleue() {return bleu;}
+
+    public boolean estEnBas() { return enBas; }
+    public void monterDescendre(){}
 }

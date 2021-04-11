@@ -1,7 +1,4 @@
-package Modele.Plateau.Objets;
-
-import Modele.Plateau.EntiteStatique;
-import Modele.Plateau.Jeu;
+package Modele.Plateau;
 
 public class Corde extends EntiteStatique{
     public Corde(Jeu _jeu){
