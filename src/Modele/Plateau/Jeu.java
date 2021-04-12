@@ -55,7 +55,7 @@ public class Jeu {
         }
 
         ArrayList<Colonne> cb1 = new ArrayList<Colonne>(); 
-        for (int i = 5; i < 11; i++){
+        for (int i = 8; i < 13; i++){
             Colonne toAdd = new Colonne(this, false);
             cb1.add(toAdd);
             addEntite(toAdd, 10, i);
@@ -67,7 +67,7 @@ public class Jeu {
 
         Radis r = new Radis(this);
         g.addEntiteDynamique(r);
-        addEntite(r, 15, 3);
+        addEntite(r, 10, 7);
 
         ArrayList<Colonne> cb2 = new ArrayList<Colonne>(); 
         for (int i = 5; i < 11; i++){
@@ -143,7 +143,14 @@ public class Jeu {
                                     ((Personnage) e).sePoseOuMonte();
                                 }
                             }
-                            ret = true;
+                            
+                            // Faire monter les entités dynamiques posées sur les colonnes avec les colonnes
+                            if (e instanceof Colonne && d == Direction.haut){
+                                if (eCible instanceof EntiteDynamique && !(eCible instanceof Colonne)){
+                                    if (deplacerEntite(eCible, d))
+                                        ret = true;
+                                } else ret = true;
+                            } else ret = true;
                         }
                         break;
                     case gauche:
