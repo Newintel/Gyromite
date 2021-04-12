@@ -93,17 +93,18 @@ public class VueControleurGyromite extends JFrame implements Observer {
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++){
                 if (jeu.getGrille()[x][y] instanceof Personnage){
-                    int d;
+                    int d = 0;
 
-                    if (((Personnage) jeu.getGrille()[x][y]).monteOuDescend())
-                        d = 2;
-                    else if (((Personnage) jeu.getGrille()[x][y]).vaADroite())
-                        d = 1;
-                    else d = 0;
+                    if (!((Personnage) jeu.getGrille()[x][y]).monteOuDescend()){
+                        d = ((Personnage) jeu.getGrille()[x][y]).vaADroite() ? 2 : 1;
 
-                    if (jeu.getGrille()[x][y] instanceof Heros)
-                        if (((Heros) jeu.getGrille()[x][y]).aUnRadis())
-                            d += 3;
+                        if (((Personnage) jeu.getGrille()[x][y]).estDevantLaCorde()) d += 2;
+
+                        if (jeu.getGrille()[x][y] instanceof Heros)
+                            if (((Heros) jeu.getGrille()[x][y]).aUnRadis())
+                                d += 4;
+                    }
+                    
 
                     ImageIcon[] icones = jeu.getGrille()[x][y] instanceof Heros ? icoHero : icoBot;
 
@@ -121,6 +122,8 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     tabJLabel[x][y].setIcon(icoHolder[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Dynamite){
                     tabJLabel[x][y].setIcon(icoDynamite);
+                } else if (jeu.getGrille()[x][y] instanceof Radis){
+                    tabJLabel[x][y].setIcon(icoRadis);
                 } else {
                     tabJLabel[x][y].setIcon(null);
                 }
@@ -142,11 +145,15 @@ public class VueControleurGyromite extends JFrame implements Observer {
 
     public void chargerLesIcones(){
         icoHero = new ImageIcon[]{
+            chargerIcone("Images/Entites/Corde/player_monte_dc.png"),
             chargerIcone("Images/Entites/player_left.png"),
             chargerIcone("Images/Entites/player_right.png"),
-            chargerIcone("Images/Entites/player_monte.png"),
+            chargerIcone("Images/Entites/Corde/player_left_dc.png"),
+            chargerIcone("Images/Entites/Corde/player_right_dc.png"),
             chargerIcone("Images/Entites/player_left_radis.png"), 
-            chargerIcone("Images/Entites/player_right_radis.png")
+            chargerIcone("Images/Entites/player_right_radis.png"),
+            chargerIcone("Images/Entites/Corde/player_left_radis_dc.png"), 
+            chargerIcone("Images/Entites/Corde/player_right_radis_dc.png")
         };
         icoColonne = new ImageIcon[]{
             chargerIcone("Images/Evt/pilier_bleu.png"), 
@@ -162,6 +169,14 @@ public class VueControleurGyromite extends JFrame implements Observer {
             chargerIcone("Images/Evt/pilier_holder_droite.png")
         };
         icoDynamite = chargerIcone("Images/Entites/bombe.png");
+        icoBot = new ImageIcon[]{
+            chargerIcone("Images/Entites/Corde/ennemi_monte_dc.png"),
+            chargerIcone("Images/Entites/ennemi_left.png"),
+            chargerIcone("Images/Entites/ennemi_right.png"),
+            chargerIcone("Images/Entites/Corde/ennemi_left_dc.png"),
+            chargerIcone("Images/Entites/Corde/ennemi_right_dc.png")
+        };
+        icoRadis = chargerIcone("Images/Entites/radis.png");
     }
 
     @Override

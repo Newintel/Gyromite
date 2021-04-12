@@ -40,7 +40,6 @@ public class Jeu {
 
         Gravite g = new Gravite();
         g.addEntiteDynamique(hector);
-        ordonnanceur.add(g);
         
         Controle4Directions.getInstance().addEntiteDynamique(hector);
         ordonnanceur.add(Controle4Directions.getInstance());
@@ -65,7 +64,25 @@ public class Jeu {
         addEntite(new Holder(this, false), 9, 10);
 
         ControleColonneRouge.getInstance().addEntiteDynamique(cb1);
+
+        Radis r = new Radis(this);
+        g.addEntiteDynamique(r);
+        addEntite(r, 15, 3);
+
+        ArrayList<Colonne> cb2 = new ArrayList<Colonne>(); 
+        for (int i = 5; i < 11; i++){
+            Colonne toAdd = new Colonne(this, true);
+            cb2.add(toAdd);
+            addEntite(toAdd, 15, i);
+        }
+
+        addEntite(new Holder(this, true), 16, 10);
+
+        ControleColonneBleue.getInstance().addEntiteDynamique(cb2);
         ordonnanceur.add(ControleColonneRouge.getInstance());
+        ordonnanceur.add(ControleColonneBleue.getInstance());
+        
+        ordonnanceur.add(g);
 
         addEntite(new Mur(this, false), 5, 6);
     }
@@ -103,15 +120,29 @@ public class Jeu {
         Point pCourant = map.get(e);
         Point pCible = calculerPointCible(pCourant, d);
 
-        if (contenuDansGrille(pCible))
-            if (ObjetALaPosition(pCible) == null || ObjetALaPosition(pCible).peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
+        Entite eCible = ObjetALaPosition(pCible);
+        Entite eBas = regarderDansLaDirection(e, Direction.bas);
+
+        if (contenuDansGrille(pCible)){
+            boolean bougerED = false;
+            if (eBas instanceof EntiteDynamique)
+                bougerED = e instanceof EntiteDynamique && eBas instanceof Colonne;
+
+            if (eCible == null || !eCible.peutServirDeSupport() || bougerED){ // TODO: penser aux collisions
                 switch (d){
                     case haut:
                     case bas:
                         if (cmptDeplV.get(e) == null){
                             cmptDeplV.put(e, 1);
-                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre())
-                                ((Personnage) e).sePoseOuMonte();
+                            if (e instanceof Personnage){
+                                if (eCible != null && eCible.peutPermettreDeMonterDescendre())
+                                    ((Personnage) e).sePoseOuMonte();
+                                
+                                if (eCible instanceof Corde && regarderDansLaDirection(eCible, Direction.bas).peutServirDeSupport()){
+                                    ((Personnage) e).passeDevantLaCorde();
+                                    ((Personnage) e).sePoseOuMonte();
+                                }
+                            }
                             ret = true;
                         }
                         break;
@@ -126,13 +157,16 @@ public class Jeu {
                         break;
                 }
             }
+        }
 
             if (ret){
+                boolean remettreCorde = false;
                 if (e instanceof Personnage){
                     if (ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && d.getValue() > 1)
                         ((Personnage) e).sePoseOuMonte();
                     else if (((Personnage) e).vaADroite() && d == Direction.gauche || !((Personnage) e).vaADroite() && d == Direction.droite)
                         ((Personnage) e).seTourne();
+                    else if (((Personnage) e).estDevantLaCorde() || ((Personnage) e).monteOuDescend()) remettreCorde = true;
                     
                     if (e instanceof Heros)
                         if (ObjetALaPosition(pCible) instanceof Dynamite)
@@ -140,6 +174,8 @@ public class Jeu {
                 }
 
                 deplacerEntite(pCourant, pCible, e);
+
+                if (remettreCorde) addEntite(new Corde(this), pCourant.x, pCourant.y);
             }
 
         return ret;

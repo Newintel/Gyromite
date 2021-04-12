@@ -2,7 +2,8 @@ package Modele.Plateau;
 
 public abstract class Personnage extends EntiteDynamique {
     private boolean droite = true;
-    private boolean monteOuDescend;
+    private boolean monteOuDescend = false;
+    private boolean corde = false;
 
     public Personnage(Jeu _jeu){
         super(_jeu);
@@ -17,4 +18,7 @@ public abstract class Personnage extends EntiteDynamique {
 
     public boolean monteOuDescend(){ return monteOuDescend; }
     public void sePoseOuMonte(){ monteOuDescend = !monteOuDescend; }
+
+    public boolean estDevantLaCorde(){ return corde; }
+    public void passeDevantLaCorde(){ corde = !corde; }
 }
