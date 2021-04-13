@@ -5,7 +5,7 @@ import java.util.ArrayList;
 /**
 Tous les déplacement sont déclenchés par cette classe (gravité, controle clavier, IA, etc.)
  */
-public abstract class RealisateurDeDeplacement<T> {
+public abstract class RealisateurDeDeplacements<T> {
     protected ArrayList<T> listEntitesDynamiques = new ArrayList<T>();
     protected abstract boolean realiserDeplacement();
 

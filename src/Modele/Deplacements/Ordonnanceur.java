@@ -9,9 +9,9 @@ import static java.lang.Thread.*;
 
 public class Ordonnanceur extends Observable implements Runnable {
     private Jeu jeu;
-    private ArrayList<RealisateurDeDeplacement> listDeplacements = new ArrayList<RealisateurDeDeplacement>();
+    private ArrayList<RealisateurDeDeplacements> listDeplacements = new ArrayList<RealisateurDeDeplacements>();
     private long pause;
-    public void add(RealisateurDeDeplacement deplacement) {
+    public void add(RealisateurDeDeplacements deplacement) {
         listDeplacements.add(deplacement);
     }
 
@@ -30,7 +30,7 @@ public class Ordonnanceur extends Observable implements Runnable {
 
         while(true) {
             jeu.resetCmptDepl();
-            for (RealisateurDeDeplacement d : listDeplacements) {
+            for (RealisateurDeDeplacements d : listDeplacements) {
                 if (d.realiserDeplacement())
                     update = true;
             }

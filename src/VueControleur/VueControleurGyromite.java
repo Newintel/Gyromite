@@ -81,7 +81,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     case KeyEvent.VK_RIGHT : Controle4Directions.getInstance().setDirectionCourante(Direction.droite); break;
                     case KeyEvent.VK_DOWN : Controle4Directions.getInstance().setDirectionCourante(Direction.bas); break;
                     case KeyEvent.VK_UP : Controle4Directions.getInstance().setDirectionCourante(Direction.haut); break;
-                    case KeyEvent.VK_C : break; // Attraper radis
+                    case KeyEvent.VK_C : jeu.getHector().attraperRadis(); break; // Attraper radis
                     case KeyEvent.VK_D : ControleColonneBleue.getInstance().ouvrirFermer(); break;
                     case KeyEvent.VK_F : ControleColonneRouge.getInstance().ouvrirFermer(); break; // Colonnes rouges
                 }
@@ -92,8 +92,9 @@ public class VueControleurGyromite extends JFrame implements Observer {
     private void mettreAJourAffichage(){
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++){
+                int d;
                 if (jeu.getGrille()[x][y] instanceof Personnage){
-                    int d = 0;
+                    d = 0;
 
                     if (!((Personnage) jeu.getGrille()[x][y]).monteOuDescend()){
                         d = ((Personnage) jeu.getGrille()[x][y]).vaADroite() ? 2 : 1;
@@ -110,15 +111,16 @@ public class VueControleurGyromite extends JFrame implements Observer {
 
                     tabJLabel[x][y].setIcon(icones[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Colonne){
-                    int d = ((Colonne) jeu.getGrille()[x][y]).estBleue() ? 0 : 1;
+                    d = ((Colonne) jeu.getGrille()[x][y]).estBleue() ? 0 : 1;
                     tabJLabel[x][y].setIcon(icoColonne[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Mur){
-                    int d = ((Mur) jeu.getGrille()[x][y]).estVertical() ? 1 : 0;
+                    if (((Mur) jeu.getGrille()[x][y]).estUneBrique()) d = 2;
+                    else d = ((Mur) jeu.getGrille()[x][y]).estVertical() ? 1 : 0;
                     tabJLabel[x][y].setIcon(icoMur[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Corde){
                     tabJLabel[x][y].setIcon(icoCorde);
                 } else if (jeu.getGrille()[x][y] instanceof Holder){
-                    int d = ((Holder) jeu.getGrille()[x][y]).droite() ? 1 : 0;
+                    d = ((Holder) jeu.getGrille()[x][y]).droite() ? 1 : 0;
                     tabJLabel[x][y].setIcon(icoHolder[d]);
                 } else if (jeu.getGrille()[x][y] instanceof Dynamite){
                     tabJLabel[x][y].setIcon(icoDynamite);
@@ -161,7 +163,8 @@ public class VueControleurGyromite extends JFrame implements Observer {
         };
         icoMur = new ImageIcon[]{
             chargerIcone("Images/Evt/mur_horizontal.png"), 
-            chargerIcone("Images/Evt/mur_vertical.png")
+            chargerIcone("Images/Evt/mur_vertical.png"),
+            chargerIcone("Images/Evt/mur_briques.png")
         };
         icoCorde = chargerIcone("Images/Evt/corde.png");
         icoHolder = new ImageIcon[]{

@@ -1,7 +1,7 @@
 package Modele.Deplacements;
 import Modele.Plateau.*;
 
-public class Controle4Directions extends RealisateurDeDeplacement<EntiteDynamique> {
+public class Controle4Directions extends RealisateurDeDeplacements<EntiteDynamique> {
     private Direction directionCourante;
     // Design pattern singleton
     private static Controle4Directions c3d;
@@ -16,23 +16,10 @@ public class Controle4Directions extends RealisateurDeDeplacement<EntiteDynamiqu
     public boolean realiserDeplacement() {
         boolean ret = false;
         for (EntiteDynamique e : listEntitesDynamiques) {
-            if (directionCourante != null)
-                switch (directionCourante) {
-                    case gauche:
-                    case droite:
-                        if (e.avancerDirectionChoisie(directionCourante))
-                            ret = true;
-                        break;
-
-                    case haut:
-                        if (e.avancerDirectionChoisie(directionCourante))
-                            ret = true;
-                        break;
-                    case bas:
-                        if (e.avancerDirectionChoisie(directionCourante))
-                            ret = true;
-                        break;
-                }
+            if (directionCourante != null){
+                if (e.avancerDirectionChoisie(directionCourante))
+                    ret = true;
+            }
         }
 
         return ret;

@@ -4,6 +4,8 @@ public abstract class Personnage extends EntiteDynamique {
     private boolean droite = true;
     private boolean monteOuDescend = false;
     private boolean corde = false;
+    private Radis radisSurLeChemin;
+    protected boolean radis = false;
 
     public Personnage(Jeu _jeu){
         super(_jeu);
@@ -22,4 +24,10 @@ public abstract class Personnage extends EntiteDynamique {
 
     public boolean estDevantLaCorde(){ return corde; }
     public void passeDevantLaCorde(){ corde = !corde; }
+
+    public abstract void attraperRadis();
+    public boolean aUnRadis(){ return radis; }
+    public boolean aUnRadisSurLeChemin(){ return radisSurLeChemin != null; }
+    public Radis getRadisSurLeChemin(){ return radisSurLeChemin; }
+    public void setRadisSurLeChemin(Radis radis){ radisSurLeChemin = radis; }
 }

@@ -4,7 +4,7 @@ import Modele.Plateau.Entite;
 import Modele.Plateau.EntiteDynamique;
 import Modele.Plateau.Personnage;
 
-public class Gravite extends RealisateurDeDeplacement<EntiteDynamique> {
+public class Gravite extends RealisateurDeDeplacements<EntiteDynamique> {
 
     // private Direction sens;
 

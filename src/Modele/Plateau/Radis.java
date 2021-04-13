@@ -6,6 +6,6 @@ public class Radis extends EntiteDynamique{
     }
 
     public boolean peutEtreEcrase() { return false; }
-    public boolean peutServirDeSupport() { return true; }
+    public boolean peutServirDeSupport() { return false; }
     public boolean peutPermettreDeMonterDescendre() { return false; }
 }
