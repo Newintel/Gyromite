@@ -2,6 +2,7 @@ package Modele.Plateau;
 
 public class Colonne extends EntiteDynamique{
     private boolean bleu;
+    private Radis radisSurLeChemin;
 
     public Colonne(Jeu _jeu, boolean estBleu){
         super(_jeu);
@@ -15,4 +16,8 @@ public class Colonne extends EntiteDynamique{
     public boolean peutPermettreDeMonterDescendre() { return false; }
 
     public boolean estBleue() {return bleu;}
+
+    public boolean aUnRadisSurLeChemin(){ return radisSurLeChemin != null; }
+    public Radis getRadisSurLeChemin(){ return radisSurLeChemin; }
+    public void setRadisSurLeChemin(Radis radis){ radisSurLeChemin = radis; }
 }

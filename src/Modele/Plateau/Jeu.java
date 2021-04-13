@@ -70,7 +70,7 @@ public class Jeu {
         ControleColonneRouge.getInstance().addEntiteDynamique(cb1);
 
         ArrayList<Colonne> cb2 = new ArrayList<Colonne>(); 
-        for (int i = 5; i < 11; i++){
+        for (int i = 1; i < 11; i++){
             Colonne toAdd = new Colonne(this, true);
             cb2.add(toAdd);
             addEntite(toAdd, 15, i);
@@ -89,7 +89,7 @@ public class Jeu {
         
         Radis r = new Radis(this);
         g.addEntiteDynamique(r);
-        addEntite(r, 10, 18);
+        addEntite(r, 15, 18);
     }
 
     private boolean contenuDansGrille(Point p){
@@ -133,8 +133,10 @@ public class Jeu {
 
         if (contenuDansGrille(pCible)){
             boolean bougerED = false;
-            if (eBas instanceof EntiteDynamique)
+            if (eBas instanceof EntiteDynamique){
                 bougerED = e instanceof EntiteDynamique && eBas instanceof Colonne;
+                bougerED &= d == Direction.bas && regarderDansLaDirection(eBas, d) != null && !regarderDansLaDirection(eBas, d).peutServirDeSupport();
+            }
 
             if (eCible == null || !eCible.peutServirDeSupport() || bougerED || eCible.peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
                 switch (d){
@@ -153,17 +155,27 @@ public class Jeu {
                                     remettreCorde = true;
                                     ret = true;
                                 } else if (eCible == null || !eCible.peutServirDeSupport()){
-                                    ret = d == Direction.bas || eBas instanceof Colonne;
+                                    ret = d == Direction.bas || eBas instanceof Colonne && cmptDeplV.get(eBas) != null;
                                 }
                                 if (eCible instanceof Radis){
                                     perso.setRadisSurLeChemin((Radis) eCible);
                                 }
-                            } else if (e instanceof Colonne && d == Direction.haut){ // Faire monter les entités dynamiques posées sur les colonnes avec les colonnes
-                                if (eCible instanceof EntiteDynamique && !(eCible instanceof Colonne)){
-                                    if (deplacerEntite(eCible, d)){
-                                        ret = true;
+                            } else if (e instanceof Colonne){
+                                if (d == Direction.haut){// Faire monter les entités dynamiques posées sur les colonnes avec les colonnes
+                                    if (eCible instanceof EntiteDynamique && !(eCible instanceof Colonne)){
+                                        if (deplacerEntite(eCible, d)){
+                                            ret = true;
+                                        }
+                                    } else ret = true;
+                                    if (((Colonne) e).aUnRadisSurLeChemin()){
+                                        poserRadis = true;
                                     }
-                                } else ret = true;
+                                } else {
+                                    if (eCible instanceof Radis){
+                                        ((Colonne) e).setRadisSurLeChemin((Radis) eCible);
+                                    }
+                                    ret = true;
+                                }
                             } else ret = true;
                         }
                         break;
@@ -219,8 +231,15 @@ public class Jeu {
 
             if (remettreCorde) addEntite(new Corde(this), pCourant.x, pCourant.y);
             if (poserRadis){
-                Radis r = ((Personnage) e).getRadisSurLeChemin();
-                ((Personnage) e).setRadisSurLeChemin(null);
+                Radis r;
+                if (e instanceof Personnage){
+                    r = ((Personnage) e).getRadisSurLeChemin();
+                    ((Personnage) e).setRadisSurLeChemin(null);
+                } else {
+                    r = ((Colonne) e).getRadisSurLeChemin();
+                    ((Colonne) e).setRadisSurLeChemin(null);
+                }
+                
                 addEntite(r, pCourant.x, pCourant.y);
             }
         }
@@ -230,7 +249,8 @@ public class Jeu {
             if (perso.monteOuDescend() && perso.estDevantLaCorde()){
                 perso.passeDevantLaCorde();
             }
-            System.out.println("A un radis: " + perso.aUnRadis() + "; x: " + map.get(e).x + "; y: " + map.get(e).y);
+            if (((Personnage) e) instanceof Heros)
+                System.out.println("Vies: " + ((Heros) perso).getHp() + "; x: " + map.get(e).x + "; y: " + map.get(e).y);
         }
 
         return ret;
