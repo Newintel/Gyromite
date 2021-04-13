@@ -2,6 +2,7 @@ package Modele.Deplacements;
 
 import Modele.Plateau.Entite;
 import Modele.Plateau.EntiteDynamique;
+import Modele.Plateau.Personnage;
 
 public class Gravite extends RealisateurDeDeplacement<EntiteDynamique> {
 
@@ -16,10 +17,12 @@ public class Gravite extends RealisateurDeDeplacement<EntiteDynamique> {
         boolean ret = false;
 
         for (EntiteDynamique e : listEntitesDynamiques){
-            Entite b = e.regarderDansLaDirection(Direction.bas);
-            if (b == null || (b != null && !b.peutServirDeSupport()))
-                if (e.avancerDirectionChoisie(Direction.bas))
-                    ret = true;
+            if (!(e instanceof Personnage && ((Personnage) e).monteOuDescend())){
+                Entite b = e.regarderDansLaDirection(Direction.bas);
+                if (b == null || (b != null && !b.peutServirDeSupport()))
+                    if (e.avancerDirectionChoisie(Direction.bas))
+                        ret = true;
+            }
         }
 
         return ret;

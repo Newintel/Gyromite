@@ -6,4 +6,5 @@ public class Corde extends EntiteStatique{
     }
 
     public boolean peutServirDeSupport() { return false; }
+    public boolean peutPermettreDeMonterDescendre() { return true; }
 }

@@ -38,8 +38,12 @@ public class Jeu {
         hector = new Heros(this);
         addEntite(hector, 5, 4);
 
+        ordonnanceur.add(ControleColonneRouge.getInstance());
+        ordonnanceur.add(ControleColonneBleue.getInstance());
+
         Gravite g = new Gravite();
         g.addEntiteDynamique(hector);
+        ordonnanceur.add(g);
         
         Controle4Directions.getInstance().addEntiteDynamique(hector);
         ordonnanceur.add(Controle4Directions.getInstance());
@@ -65,10 +69,6 @@ public class Jeu {
 
         ControleColonneRouge.getInstance().addEntiteDynamique(cb1);
 
-        Radis r = new Radis(this);
-        g.addEntiteDynamique(r);
-        addEntite(r, 10, 7);
-
         ArrayList<Colonne> cb2 = new ArrayList<Colonne>(); 
         for (int i = 5; i < 11; i++){
             Colonne toAdd = new Colonne(this, true);
@@ -79,10 +79,11 @@ public class Jeu {
         addEntite(new Holder(this, true), 16, 10);
 
         ControleColonneBleue.getInstance().addEntiteDynamique(cb2);
-        ordonnanceur.add(ControleColonneRouge.getInstance());
-        ordonnanceur.add(ControleColonneBleue.getInstance());
-        
-        ordonnanceur.add(g);
+
+        for (int i = 2; i < 19; i++){
+            addEntite(new Corde(this), 6, i);
+            addEntite(new Corde(this), 7, i);
+        }
 
         addEntite(new Mur(this, false), 5, 6);
     }
@@ -123,32 +124,37 @@ public class Jeu {
         Entite eCible = ObjetALaPosition(pCible);
         Entite eBas = regarderDansLaDirection(e, Direction.bas);
 
+        boolean remettreCorde = false;
+
         if (contenuDansGrille(pCible)){
             boolean bougerED = false;
             if (eBas instanceof EntiteDynamique)
                 bougerED = e instanceof EntiteDynamique && eBas instanceof Colonne;
 
-            if (eCible == null || !eCible.peutServirDeSupport() || bougerED){ // TODO: penser aux collisions
+            if (eCible == null || !eCible.peutServirDeSupport() || bougerED || eCible.peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
                 switch (d){
                     case haut:
                     case bas:
                         if (cmptDeplV.get(e) == null){
                             cmptDeplV.put(e, 1);
+
                             if (e instanceof Personnage){
-                                if (eCible != null && eCible.peutPermettreDeMonterDescendre())
-                                    ((Personnage) e).sePoseOuMonte();
-                                
-                                if (eCible instanceof Corde && regarderDansLaDirection(eCible, Direction.bas).peutServirDeSupport()){
-                                    ((Personnage) e).passeDevantLaCorde();
-                                    ((Personnage) e).sePoseOuMonte();
+                                Personnage perso = (Personnage) e;
+
+                                if (eCible != null && eCible.peutPermettreDeMonterDescendre()){
+                                    if (!perso.monteOuDescend()){
+                                        perso.sePoseOuMonte();
+                                    }
+                                    remettreCorde = true;
+                                    ret = true;
+                                } else if (eCible == null || !eCible.peutServirDeSupport()){
+                                    ret = d == Direction.bas || eBas instanceof Colonne;
                                 }
-                            }
-                            
-                            // Faire monter les entités dynamiques posées sur les colonnes avec les colonnes
-                            if (e instanceof Colonne && d == Direction.haut){
+                            } else if (e instanceof Colonne && d == Direction.haut){ // Faire monter les entités dynamiques posées sur les colonnes avec les colonnes
                                 if (eCible instanceof EntiteDynamique && !(eCible instanceof Colonne)){
-                                    if (deplacerEntite(eCible, d))
+                                    if (deplacerEntite(eCible, d)){
                                         ret = true;
+                                    }
                                 } else ret = true;
                             } else ret = true;
                         }
@@ -157,33 +163,56 @@ public class Jeu {
                     case droite:
                         if (cmptDeplH.get(e) == null){
                             cmptDeplH.put(e, 1);
-                            if (e instanceof Personnage && ObjetALaPosition(pCible) != null && !ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && ((Personnage) e).monteOuDescend())
-                                ((Personnage) e).sePoseOuMonte();
                             ret = true;
+
+                            if (e instanceof Personnage){
+                                Personnage perso = (Personnage) e;
+
+                                if (perso.vaADroite() ^ d == Direction.droite){
+                                    perso.seTourne();
+                                }
+                                if (perso.estDevantLaCorde() || perso.monteOuDescend()){
+                                    remettreCorde = true;
+                                }
+                                if (eCible instanceof Corde ^ perso.estDevantLaCorde()){
+                                    Entite o = ObjetALaPosition(calculerPointCible(calculerPointCible(pCourant, d), Direction.bas));
+                                    if (o != null && o.peutServirDeSupport())
+                                        perso.passeDevantLaCorde();
+                                }
+                                if (eCible != null && eCible.peutPermettreDeMonterDescendre()){
+                                    if (regarderDansLaDirection(eCible, Direction.bas) != null && !regarderDansLaDirection(eCible, Direction.bas).peutServirDeSupport() && !perso.monteOuDescend()){
+                                        perso.sePoseOuMonte();
+                                    }
+                                }
+                                if (eCible == null && perso.monteOuDescend()){
+                                    perso.sePoseOuMonte();
+                                }
+                            }
                         }
+
                         break;
                 }
             }
         }
 
-            if (ret){
-                boolean remettreCorde = false;
-                if (e instanceof Personnage){
-                    if (ObjetALaPosition(pCible) != null && ObjetALaPosition(pCible).peutPermettreDeMonterDescendre() && d.getValue() > 1)
-                        ((Personnage) e).sePoseOuMonte();
-                    else if (((Personnage) e).vaADroite() && d == Direction.gauche || !((Personnage) e).vaADroite() && d == Direction.droite)
-                        ((Personnage) e).seTourne();
-                    else if (((Personnage) e).estDevantLaCorde() || ((Personnage) e).monteOuDescend()) remettreCorde = true;
-                    
-                    if (e instanceof Heros)
-                        if (ObjetALaPosition(pCible) instanceof Dynamite)
-                            ((Heros) e).attraperDynamite();
-                }
-
-                deplacerEntite(pCourant, pCible, e);
-
-                if (remettreCorde) addEntite(new Corde(this), pCourant.x, pCourant.y);
+        if (ret){
+            
+            if (e instanceof Heros && ObjetALaPosition(pCible) instanceof Dynamite){
+                ((Heros) e).attraperDynamite();
             }
+
+            deplacerEntite(pCourant, pCible, e);
+
+            if (remettreCorde) addEntite(new Corde(this), pCourant.x, pCourant.y);
+        }
+
+        if (e instanceof Personnage){
+            Personnage perso = (Personnage) e;
+            if (perso.monteOuDescend() && perso.estDevantLaCorde()){
+                perso.passeDevantLaCorde();
+            }
+            System.out.println("Monte: " + perso.monteOuDescend() + "; Passe devant la corde: " + perso.estDevantLaCorde() + "; x: " + map.get(e).x + "; y: " + map.get(e).y);
+        }
 
         return ret;
     }

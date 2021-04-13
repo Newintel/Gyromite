@@ -25,8 +25,12 @@ public class Controle4Directions extends RealisateurDeDeplacement<EntiteDynamiqu
                         break;
 
                     case haut:
+                        if (e.avancerDirectionChoisie(directionCourante))
+                            ret = true;
                         break;
                     case bas:
+                        if (e.avancerDirectionChoisie(directionCourante))
+                            ret = true;
                         break;
                 }
         }

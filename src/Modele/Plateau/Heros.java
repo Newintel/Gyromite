@@ -4,6 +4,7 @@ public class Heros extends Personnage{
     private int hp = 3;
     private int nombreDeDynamites = 0;
     private boolean radis = false;
+    private Radis radisDuHeros;
 
     public Heros(Jeu _jeu){
         super(_jeu);
@@ -17,4 +18,7 @@ public class Heros extends Personnage{
 
     public void seBlesser(){ hp--; }
     public int getHp(){ return hp; }
+
+    public void setRadis(){}
+    public Radis getRadis(){ return radisDuHeros; }
 }

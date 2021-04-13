@@ -18,6 +18,7 @@ public abstract class Personnage extends EntiteDynamique {
 
     public boolean monteOuDescend(){ return monteOuDescend; }
     public void sePoseOuMonte(){ monteOuDescend = !monteOuDescend; }
+    public void accroche(){ monteOuDescend = true; }
 
     public boolean estDevantLaCorde(){ return corde; }
     public void passeDevantLaCorde(){ corde = !corde; }
