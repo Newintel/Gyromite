@@ -25,7 +25,7 @@ public abstract class Personnage extends EntiteDynamique {
     public boolean estDevantLaCorde(){ return corde; }
     public void passeDevantLaCorde(){ corde = !corde; }
 
-    public abstract void attraperRadis();
+    public abstract void attraperPoserRadis();
     public boolean aUnRadis(){ return radis; }
     public boolean aUnRadisSurLeChemin(){ return radisSurLeChemin != null; }
     public Radis getRadisSurLeChemin(){ return radisSurLeChemin; }

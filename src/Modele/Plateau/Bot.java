@@ -5,7 +5,7 @@ public class Bot extends Personnage {
         super(_jeu);
     }
 
-    public void attraperRadis(){
+    public void attraperPoserRadis(){
         if (aUnRadisSurLeChemin())
             radis = true;
     }

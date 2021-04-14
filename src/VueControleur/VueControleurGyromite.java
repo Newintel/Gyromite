@@ -5,6 +5,7 @@ import java.awt.GridLayout;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
+import java.awt.BorderLayout;
 import java.io.File;
 import java.io.IOException;
 import java.util.Observable;
@@ -39,6 +40,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
     private ImageIcon icoDynamite;
 
     private JLabel[][] tabJLabel; // cases graphique (au moment du rafraichissement, chaque case va être associée à une icône, suivant ce qui est présent dans le modèle)
+    private JLabel[] tabJPanneau;
 
     public VueControleurGyromite(Jeu _jeu) {
         sizeX = jeu.SIZE_X;
@@ -48,28 +50,44 @@ public class VueControleurGyromite extends JFrame implements Observer {
         chargerLesIcones();
         placerLesComposantsGraphiques();
         ajouterEcouteurClavier();
-        setResizable(false);
+        setResizable(true);
     }
 
     private void placerLesComposantsGraphiques() {
         setTitle("Gyromite");
-        setSize(18 * sizeX, 19 * sizeY);
+        setSize(18 * sizeX, 19 * (sizeY + 3));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // permet de terminer l'application à la fermeture de la fenêtre
 
+        JComponent panneau = new JPanel(new GridLayout(1, 2));
+        tabJPanneau = new JLabel[2];
+
+        JLabel score = new JLabel();
+        score.setSize(18 * sizeX / 5, 20);
+        score.setOpaque(true);
+        panneau.add(score);
+        tabJPanneau[0] = score;
+
+        JLabel time = new JLabel();
+        time.setSize(18 * sizeX / 5, 20);
+        time.setOpaque(true);
+        panneau.add(time);
+        tabJPanneau[1] = time;
+
+        add(panneau, BorderLayout.NORTH);
         JComponent grilleJLabels = new JPanel(new GridLayout(sizeY, sizeX)); // grilleJLabels va contenir les cases graphiques et les positionner sous la forme d'une grille
 
         tabJLabel = new JLabel[sizeX][sizeY];
-
         for (int y = 0; y < sizeY; y++) {
             for (int x = 0; x < sizeX; x++) {
                 JLabel jlab = new JLabel();
                 jlab.setOpaque(true);
                 jlab.setBackground(Color.BLUE);
+                jlab.setSize(18, 19);
                 tabJLabel[x][y] = jlab; // on conserve les cases graphiques dans tabJLabel pour avoir un accès pratique à celles-ci (voir mettreAJourAffichage() )
                 grilleJLabels.add(jlab);
             }
         }
-        add(grilleJLabels);
+        add(grilleJLabels, BorderLayout.SOUTH);
     }
 
     private void ajouterEcouteurClavier() {
@@ -81,7 +99,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     case KeyEvent.VK_RIGHT : Controle4Directions.getInstance().setDirectionCourante(Direction.droite); break;
                     case KeyEvent.VK_DOWN : Controle4Directions.getInstance().setDirectionCourante(Direction.bas); break;
                     case KeyEvent.VK_UP : Controle4Directions.getInstance().setDirectionCourante(Direction.haut); break;
-                    case KeyEvent.VK_C : jeu.getHector().attraperRadis(); break; // Attraper radis
+                    case KeyEvent.VK_C : jeu.getHector().attraperPoserRadis(); break; // Attraper radis
                     case KeyEvent.VK_D : ControleColonneBleue.getInstance().ouvrirFermer(); break;
                     case KeyEvent.VK_F : ControleColonneRouge.getInstance().ouvrirFermer(); break; // Colonnes rouges
                 }
@@ -90,6 +108,9 @@ public class VueControleurGyromite extends JFrame implements Observer {
     }
 
     private void mettreAJourAffichage(){
+        tabJPanneau[0].setText("Score : " + jeu.getHector().getScore());
+        tabJPanneau[1].setText("Time : " + jeu.getTime());
+
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++){
                 int d;
@@ -126,6 +147,8 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     tabJLabel[x][y].setIcon(icoDynamite);
                 } else if (jeu.getGrille()[x][y] instanceof Radis){
                     tabJLabel[x][y].setIcon(icoRadis);
+                } else if (jeu.getGrille()[x][y] instanceof Panneau){
+                    tabJLabel[x][y].setText("1");
                 } else {
                     tabJLabel[x][y].setIcon(null);
                 }

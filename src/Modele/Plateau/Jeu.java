@@ -8,6 +8,7 @@ import Modele.Deplacements.*;
 public class Jeu {
     public static final int SIZE_X = 20;
     public static final int SIZE_Y = 20;
+    private int time = 90;
 
     // compteur de déplacements horizontal et vertical (1 max par défaut, à chaque pas de temps)
     private HashMap<Entite, Integer> cmptDeplH = new HashMap<Entite, Integer>();
@@ -18,10 +19,13 @@ public class Jeu {
     private HashMap<Entite, Point> map = new  HashMap<Entite, Point>(); // permet de récupérer la position d'une entité à partir de sa référence
     private Entite[][] grilleEntites = new Entite[SIZE_X][SIZE_Y]; // permet de récupérer une entité à partir de ses coordonnées
 
+    private Gravite gravite = new Gravite();
+
     private Ordonnanceur ordonnanceur = new Ordonnanceur(this);
 
     public Jeu(){
         initialisationDesEntites();
+        ordonnanceur.add(gravite);
     }
 
     public void resetCmptDepl() {
@@ -41,9 +45,7 @@ public class Jeu {
         ordonnanceur.add(ControleColonneRouge.getInstance());
         ordonnanceur.add(ControleColonneBleue.getInstance());
 
-        Gravite g = new Gravite();
-        g.addEntiteDynamique(hector);
-        ordonnanceur.add(g);
+        gravite.addEntiteDynamique(hector);
         
         Controle4Directions.getInstance().addEntiteDynamique(hector);
         ordonnanceur.add(Controle4Directions.getInstance());
@@ -61,7 +63,7 @@ public class Jeu {
         ArrayList<Colonne> cb1 = new ArrayList<Colonne>(); 
         for (int i = 4; i < 13; i++){
             Colonne toAdd;
-            if (i == 2 || i == 13) toAdd = new Colonne(this, false, true);
+            if (i == 4 || i == 12) toAdd = new Colonne(this, false, true);
             else toAdd = new Colonne(this, false, false);
             cb1.add(toAdd);
             addEntite(toAdd, 10, i);
@@ -73,9 +75,9 @@ public class Jeu {
         ControleColonneRouge.getInstance().addEntiteDynamique(cb1);
 
         ArrayList<Colonne> cb2 = new ArrayList<Colonne>(); 
-        for (int i = 2; i < 12; i++){
+        for (int i = 3; i < 12; i++){
             Colonne toAdd;
-            if (i == 2 || i == 11) toAdd = new Colonne(this, true, true);
+            if (i == 3 || i == 11) toAdd = new Colonne(this, true, true);
             else toAdd = new Colonne(this, true, false);
             cb2.add(toAdd);
             addEntite(toAdd, 15, i);
@@ -93,11 +95,11 @@ public class Jeu {
         addEntite(new Mur(this, false), 5, 6);
         
         Radis r = new Radis(this);
-        g.addEntiteDynamique(r);
-        addEntite(r, 15, 1);
+        gravite.addEntiteDynamique(r);
+        addEntite(r, 15, 2);
         
         Radis r2 = new Radis(this);
-        g.addEntiteDynamique(r2);
+        gravite.addEntiteDynamique(r2);
         addEntite(r2, 15, 18);
     }
 
@@ -128,12 +130,15 @@ public class Jeu {
         return ret;
     }
 
-    static void collision(Personnage perso, Entite objet){
-        if (perso instanceof Heros){
-
-        } else {
-            if (objet instanceof Colonne){
+    private void collision(EntiteDynamique perso, Entite objet){
+        if (objet instanceof Colonne){
+            gravite.removeEntiteDynamique(perso);
+            if (perso instanceof Bot){
                 // TODO: ajouter points au heros
+            } else if (perso instanceof Radis){
+                // TODO: enlever points au héros
+            } else if (perso instanceof Heros){
+                // TODO: fin du jeu
             }
         }
     }
@@ -183,8 +188,10 @@ public class Jeu {
                                     if (eCible instanceof EntiteDynamique && !(eCible instanceof Colonne)){
                                         if (deplacerEntite(eCible, d)){
                                             ret = true;
+                                        } else if (eCible != null && eCible.peutEtreEcrase()){
+                                            collision((EntiteDynamique) eCible, e);
+                                            ret = true;
                                         }
-                                        if (eCible != null && eCible.peutEtreEcrase()) ret = true; // ! replace l'objet pour une raison quelconque
                                     } else ret = true;
                                 } else ret = true;
                             } else ret = true;
@@ -261,8 +268,7 @@ public class Jeu {
             if (perso.monteOuDescend() && perso.estDevantLaCorde()){
                 perso.passeDevantLaCorde();
             }
-            if (((Personnage) e) instanceof Heros)
-                System.out.println("Vies: " + ((Heros) perso).getHp() + "; x: " + map.get(e).x + "; y: " + map.get(e).y);
+            if (e instanceof Heros) System.out.println(map.get(e).x + " " + map.get(e).y);
         }
 
         return ret;
@@ -293,5 +299,15 @@ public class Jeu {
 
     public void start(long _pause){
         ordonnanceur.start(_pause);
+    }
+    
+    public void updateTime(){
+        if (ordonnanceur.getTurn() == 0){
+            time--;
+        }
+    }
+
+    public int getTime(){
+        return time;
     }
 }
