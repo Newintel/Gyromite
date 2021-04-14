@@ -9,6 +9,7 @@ import static java.lang.Thread.*;
 
 public class Ordonnanceur extends Observable implements Runnable {
     private Jeu jeu;
+    private int turn;
     private ArrayList<RealisateurDeDeplacements> listDeplacements = new ArrayList<RealisateurDeDeplacements>();
     private long pause;
     public void add(RealisateurDeDeplacements deplacement) {
@@ -24,12 +25,15 @@ public class Ordonnanceur extends Observable implements Runnable {
         new Thread(this).start();
     }
 
+    public int getTurn(){ return turn; }
+
     @Override
     public void run() {
         boolean update = false;
 
         while(true) {
             jeu.resetCmptDepl();
+            turn = (turn + 1) % (int)(1000 / pause);
             for (RealisateurDeDeplacements d : listDeplacements) {
                 if (d.realiserDeplacement())
                     update = true;

@@ -59,19 +59,24 @@ public class Jeu {
         }
 
         ArrayList<Colonne> cb1 = new ArrayList<Colonne>(); 
-        for (int i = 8; i < 13; i++){
-            Colonne toAdd = new Colonne(this, false);
+        for (int i = 4; i < 13; i++){
+            Colonne toAdd;
+            if (i == 2 || i == 13) toAdd = new Colonne(this, false, true);
+            else toAdd = new Colonne(this, false, false);
             cb1.add(toAdd);
             addEntite(toAdd, 10, i);
         }
+        addEntite(new Mur(this), 10, 1);
 
         addEntite(new Holder(this, false), 9, 10);
 
         ControleColonneRouge.getInstance().addEntiteDynamique(cb1);
 
         ArrayList<Colonne> cb2 = new ArrayList<Colonne>(); 
-        for (int i = 1; i < 11; i++){
-            Colonne toAdd = new Colonne(this, true);
+        for (int i = 2; i < 12; i++){
+            Colonne toAdd;
+            if (i == 2 || i == 11) toAdd = new Colonne(this, true, true);
+            else toAdd = new Colonne(this, true, false);
             cb2.add(toAdd);
             addEntite(toAdd, 15, i);
         }
@@ -89,7 +94,11 @@ public class Jeu {
         
         Radis r = new Radis(this);
         g.addEntiteDynamique(r);
-        addEntite(r, 15, 18);
+        addEntite(r, 15, 1);
+        
+        Radis r2 = new Radis(this);
+        g.addEntiteDynamique(r2);
+        addEntite(r2, 15, 18);
     }
 
     private boolean contenuDansGrille(Point p){
@@ -119,6 +128,16 @@ public class Jeu {
         return ret;
     }
 
+    static void collision(Personnage perso, Entite objet){
+        if (perso instanceof Heros){
+
+        } else {
+            if (objet instanceof Colonne){
+                // TODO: ajouter points au heros
+            }
+        }
+    }
+
     public boolean deplacerEntite(Entite e, Direction d){
         boolean ret = false;
 
@@ -132,13 +151,12 @@ public class Jeu {
         boolean poserRadis = false;
 
         if (contenuDansGrille(pCible)){
-            boolean bougerED = false;
-            if (eBas instanceof EntiteDynamique){
-                bougerED = e instanceof EntiteDynamique && eBas instanceof Colonne;
-                bougerED &= d == Direction.bas && regarderDansLaDirection(eBas, d) != null && !regarderDansLaDirection(eBas, d).peutServirDeSupport();
+
+            if (eCible instanceof Personnage && e instanceof Colonne && regarderDansLaDirection(eCible, d) != null && regarderDansLaDirection(eCible, d).peutServirDeSupport()){
+                collision((Personnage) eCible, e);
             }
 
-            if (eCible == null || !eCible.peutServirDeSupport() || bougerED || eCible.peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
+            if (eCible == null || !eCible.peutServirDeSupport() || eCible.peutEtreEcrase() || eCible.peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
                 switch (d){
                     case haut:
                     case bas:
@@ -166,16 +184,9 @@ public class Jeu {
                                         if (deplacerEntite(eCible, d)){
                                             ret = true;
                                         }
+                                        if (eCible != null && eCible.peutEtreEcrase()) ret = true; // ! replace l'objet pour une raison quelconque
                                     } else ret = true;
-                                    if (((Colonne) e).aUnRadisSurLeChemin()){
-                                        poserRadis = true;
-                                    }
-                                } else {
-                                    if (eCible instanceof Radis){
-                                        ((Colonne) e).setRadisSurLeChemin((Radis) eCible);
-                                    }
-                                    ret = true;
-                                }
+                                } else ret = true;
                             } else ret = true;
                         }
                         break;
@@ -230,6 +241,7 @@ public class Jeu {
             deplacerEntite(pCourant, pCible, e);
 
             if (remettreCorde) addEntite(new Corde(this), pCourant.x, pCourant.y);
+
             if (poserRadis){
                 Radis r;
                 if (e instanceof Personnage){
