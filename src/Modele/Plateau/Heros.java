@@ -5,13 +5,14 @@ public class Heros extends Personnage{
     private Radis radisDuHeros;
     private long score;
     private boolean intouchable;
+    private Radis radisSurLeChemin;
     private int momentIntouchable;
 
     public Heros(Jeu _jeu){
         super(_jeu);
     }
 
-    public void attraperDynamite() { nombreDeDynamites++; } // TODO: ajouter points au heros
+    public void attraperDynamite() { nombreDeDynamites++; score += 100; } // TODO: ajouter points au heros
     public int getNombreDeDynamites() { return nombreDeDynamites; }
 
     public boolean estIntouchable(){ return intouchable; }
@@ -31,5 +32,5 @@ public class Heros extends Personnage{
     public Radis getRadis(){ return radisDuHeros; }
 
     public long getScore(){ return score; }
-    public void addPts(long toAdd){ score += toAdd; }
+    public void addPts(long toAdd){ score += toAdd; if (score < 0) score = 0; }
 }

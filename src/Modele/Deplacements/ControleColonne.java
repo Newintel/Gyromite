@@ -5,9 +5,8 @@ import java.util.ArrayList;
 import Modele.Plateau.Colonne;
 import Modele.Plateau.Holder;
 import Modele.Plateau.EntiteDynamique;
-import Modele.Plateau.Entite;
 
-public abstract class ControleColonne extends RealisateurDeDeplacements<ArrayList<Colonne>>{
+public class ControleColonne extends RealisateurDeDeplacements<ArrayList<Colonne>>{
     private boolean haut = false;
     
     public boolean realiserDeplacement(){

@@ -17,8 +17,6 @@ import javax.swing.*;
 import javax.swing.plaf.DimensionUIResource;
 
 import Modele.Deplacements.Controle4Directions;
-import Modele.Deplacements.ControleColonneRouge;
-import Modele.Deplacements.ControleColonneBleue;
 import Modele.Deplacements.Direction;
 import Modele.Plateau.*;
 
@@ -50,26 +48,30 @@ public class VueControleurGyromite extends JFrame implements Observer {
         chargerLesIcones();
         placerLesComposantsGraphiques();
         ajouterEcouteurClavier();
-        setResizable(true);
     }
 
     private void placerLesComposantsGraphiques() {
         setTitle("Gyromite");
+        setResizable(false);
         setSize(18 * sizeX, 19 * (sizeY + 3));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // permet de terminer l'application à la fermeture de la fenêtre
 
         JComponent panneau = new JPanel(new GridLayout(1, 2));
         tabJPanneau = new JLabel[2];
 
-        JLabel score = new JLabel();
+        JLabel score = new JLabel("", 0);
         score.setSize(18 * sizeX / 5, 20);
         score.setOpaque(true);
+        score.setForeground(Color.WHITE);
+        score.setBackground(Color.BLACK);
         panneau.add(score);
         tabJPanneau[0] = score;
 
-        JLabel time = new JLabel();
+        JLabel time = new JLabel("", 0);
         time.setSize(18 * sizeX / 5, 20);
         time.setOpaque(true);
+        time.setForeground(Color.WHITE);
+        time.setBackground(Color.BLACK);
         panneau.add(time);
         tabJPanneau[1] = time;
 
@@ -100,16 +102,16 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     case KeyEvent.VK_DOWN : Controle4Directions.getInstance().setDirectionCourante(Direction.bas); break;
                     case KeyEvent.VK_UP : Controle4Directions.getInstance().setDirectionCourante(Direction.haut); break;
                     case KeyEvent.VK_C : jeu.getHector().attraperPoserRadis(); break; // Attraper radis
-                    case KeyEvent.VK_D : ControleColonneBleue.getInstance().ouvrirFermer(); break;
-                    case KeyEvent.VK_F : ControleColonneRouge.getInstance().ouvrirFermer(); break; // Colonnes rouges
+                    case KeyEvent.VK_D : jeu.getControlleur(true).ouvrirFermer(); break;
+                    case KeyEvent.VK_F : jeu.getControlleur(false).ouvrirFermer(); break; // Colonnes rouges
                 }
             }
         });
     }
 
     private void mettreAJourAffichage(){
-        tabJPanneau[0].setText("Score : " + jeu.getHector().getScore());
-        tabJPanneau[1].setText("Time : " + jeu.getTime());
+        tabJPanneau[0].setText("<html><b>Score : " + jeu.getHector().getScore() + "</b></html>");
+        tabJPanneau[1].setText("<html><b>Time : " + jeu.getTime() + "</b></html>");
 
         for (int x = 0; x < sizeX; x++)
             for (int y = 0; y < sizeY; y++){
@@ -147,8 +149,6 @@ public class VueControleurGyromite extends JFrame implements Observer {
                     tabJLabel[x][y].setIcon(icoDynamite);
                 } else if (jeu.getGrille()[x][y] instanceof Radis){
                     tabJLabel[x][y].setIcon(icoRadis);
-                } else if (jeu.getGrille()[x][y] instanceof Panneau){
-                    tabJLabel[x][y].setText("1");
                 } else {
                     tabJLabel[x][y].setIcon(null);
                 }

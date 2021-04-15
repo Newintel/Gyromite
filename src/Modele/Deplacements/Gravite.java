@@ -5,12 +5,14 @@ import Modele.Plateau.EntiteDynamique;
 import Modele.Plateau.Personnage;
 
 public class Gravite extends RealisateurDeDeplacements<EntiteDynamique> {
+    private static Gravite g;
 
-    // private Direction sens;
-
-    // public Gravite(boolean inv){
-    //     sens = inv ? Direction.haut : Direction.bas;
-    // }
+    public static Gravite getInstance(){
+        if (g == null){
+            g = new Gravite();
+        }
+        return g;
+    }
 
     @Override
     public boolean realiserDeplacement(){

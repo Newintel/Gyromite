@@ -1,5 +1,7 @@
 package Modele.Plateau;
 
+import Modele.Deplacements.Gravite;
+
 public abstract class Personnage extends EntiteDynamique {
     private boolean droite = true;
     private boolean monteOuDescend = false;
@@ -11,7 +13,7 @@ public abstract class Personnage extends EntiteDynamique {
         super(_jeu);
     }
 
-    public boolean peutServirDeSupport() { return true; }
+    public boolean peutServirDeSupport() { return false; }
     public boolean peutEtreEcrase() { return true; }
     public boolean peutPermettreDeMonterDescendre() { return false; }
 
@@ -25,7 +27,6 @@ public abstract class Personnage extends EntiteDynamique {
     public boolean estDevantLaCorde(){ return corde; }
     public void passeDevantLaCorde(){ corde = !corde; }
 
-    public abstract void attraperPoserRadis();
     public boolean aUnRadis(){ return radis; }
     public boolean aUnRadisSurLeChemin(){ return radisSurLeChemin != null; }
     public Radis getRadisSurLeChemin(){ return radisSurLeChemin; }

@@ -35,9 +35,15 @@ public class Ordonnanceur extends Observable implements Runnable {
             jeu.resetCmptDepl();
             turn = (turn + 1) % (int)(1000 / pause);
             jeu.updateTime();
-            for (RealisateurDeDeplacements d : listDeplacements) {
-                if (d.realiserDeplacement())
-                    update = true;
+            
+            if (jeu.estFini()){
+                jeu.updateScoreFinal();
+            } else{
+                for (RealisateurDeDeplacements d : listDeplacements) {
+                    d.updateControlleur();
+                    if (d.realiserDeplacement())
+                        update = true;
+                }
             }
 
             Controle4Directions.getInstance().resetDirection();
