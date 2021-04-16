@@ -48,8 +48,10 @@ public class Ordonnanceur extends Observable implements Runnable {
             } else{
                 for (RealisateurDeDeplacements d : listDeplacements) {
                     d.updateControlleur();
-                    if (d.realiserDeplacement())
-                        update = true;
+                    if (!(d instanceof IA) || turn == 0){
+                        if (d.realiserDeplacement())
+                            update = true;
+                    }
                 }
             }
 

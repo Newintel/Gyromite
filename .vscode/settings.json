@@ -23,5 +23,11 @@
     
         "*.php",
         "*.phtml"
+    ],
+    "java.dependency.packagePresentation": "hierarchical",
+    "java.project.sourcePaths": [
+        "src",
+        "Niveaux",
+        "Images"
     ]
 }

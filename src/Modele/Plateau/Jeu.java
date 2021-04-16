@@ -25,13 +25,14 @@ public class Jeu {
     private HashMap<String, ArrayList<ArrayList<Integer>>> gameMap;
 
     private Heros hector;
-    private ArrayList<Radis> radis;
+    private ArrayList<Radis> radis = new ArrayList<Radis>();
 
     private HashMap<Entite, Point> map = new  HashMap<Entite, Point>(); // permet de récupérer la position d'une entité à partir de sa référence
     private Entite[][] grilleEntites = new Entite[SIZE_X][SIZE_Y]; // permet de récupérer une entité à partir de ses coordonnées
 
     private ControleColonne cr = new ControleColonne();
     private ControleColonne cb = new ControleColonne();
+    private IA ia = new IA(this);
 
     private Ordonnanceur ordonnanceur = new Ordonnanceur(this);
 
@@ -113,6 +114,7 @@ public class Jeu {
         int y = l.get(1);
         Bot b = new Bot(this);
         Gravite.getInstance().addEntiteDynamique(b);
+        ia.addEntiteDynamique(b);
         addEntite(b, x, y);
     }
 
@@ -128,7 +130,7 @@ public class Jeu {
     private void addHolder(ArrayList<Integer> l){
         int x = l.get(0);
         int y = l.get(1);
-        boolean droite = l.get(3) == 1;
+        boolean droite = l.get(2) == 1;
         Holder h = new Holder(this, droite);
         addEntite(h, x, y);
     }
@@ -148,15 +150,7 @@ public class Jeu {
         try{
             Method method = getClass().getDeclaredMethod(name, ArrayList.class);
             method.invoke(this, l);
-        } catch (SecurityException e) {
-            e.printStackTrace();
-        } catch (NoSuchMethodException e) {
-            e.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -174,8 +168,9 @@ public class Jeu {
         ordonnanceur.add(cr);
         ordonnanceur.add(cb);
         ordonnanceur.add(Controle4Directions.getInstance());
+        ordonnanceur.add(ia);
     }
-    
+
     private boolean contenuDansGrille(Point p){
         return p.x >= 0 && p.x < SIZE_X && p.y >= 0 && p.y < SIZE_Y;
     }
@@ -209,14 +204,24 @@ public class Jeu {
             map.remove(perso);
             if (perso instanceof Bot){
                 hector.addPts(500);
+                ia.removeEntiteDynamique((Bot) perso);
             } else if (perso instanceof Radis){
                 hector.addPts(-50);
+                radis.remove(perso);
             } else if (perso instanceof Heros){
                 fin = true;
             }
         } else if (perso instanceof Personnage && objet instanceof Personnage){
-            death = ((Personnage) (objet)).vaADroite() ? Direction.droite : Direction.gauche;
-            fin = true;
+            if (
+                !(
+                perso instanceof Bot && ((Personnage) perso).aUnRadis()
+                || 
+                perso instanceof Bot && objet instanceof Bot
+                )
+            ){
+                death = ((Personnage) (objet)).vaADroite() ? Direction.droite : Direction.gauche;
+                fin = true;
+            }
         }
     }
 
@@ -232,6 +237,8 @@ public class Jeu {
         boolean remettreCorde = false;
         boolean poserRadis = false;
 
+        ArrayList<Entite> objToPutBack = new ArrayList<Entite>();
+
         if (contenuDansGrille(pCible)){
 
             if (
@@ -242,6 +249,16 @@ public class Jeu {
                 )
             ){
                 collision((Personnage) eCible, e);
+            }
+            if (e instanceof Personnage && eCible instanceof Bot){
+                Personnage perso = (Personnage) e;
+                if (((Bot) eCible).aUnRadis()){
+                    if (perso.devantUnBot()){
+                        objToPutBack.add(perso.getBot());
+                        perso.passeDevantUnBot(null);
+                    }
+                    perso.passeDevantUnBot((Bot) eCible);
+                }
             }
             if (eCible instanceof Dynamite && e instanceof Heros) ret = true;
             else if (eCible == null || !eCible.peutServirDeSupport() || eCible.peutEtreEcrase() || eCible.peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
@@ -300,6 +317,10 @@ public class Jeu {
                                 if (perso.estDevantLaCorde() || perso.monteOuDescend()){
                                     remettreCorde = true;
                                 }
+                                if (perso.devantUnBot() && eCible != perso.getBot()){
+                                    objToPutBack.add(perso.getBot());
+                                    perso.passeDevantUnBot(null);
+                                }
                                 if (eCible instanceof Corde ^ perso.estDevantLaCorde()){
                                     Entite o = ObjetALaPosition(calculerPointCible(calculerPointCible(pCourant, d), Direction.bas));
                                     if (o != null && o.peutServirDeSupport())
@@ -350,6 +371,9 @@ public class Jeu {
                 
                 addEntite(r, pCourant.x, pCourant.y);
                 Gravite.getInstance().addEntiteDynamique(r);
+            }
+            for (Entite obj : objToPutBack){
+                addEntite(obj, pCourant.x, pCourant.y);
             }
         }
 

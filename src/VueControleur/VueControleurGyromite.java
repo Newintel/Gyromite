@@ -128,9 +128,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
     
                             if (((Personnage) jeu.getGrille()[x][y]).estDevantLaCorde()) d += 2;
     
-                            if (jeu.getGrille()[x][y] instanceof Heros)
-                                if (((Heros) jeu.getGrille()[x][y]).aUnRadis())
-                                    d += 4;
+                            if (((Personnage) jeu.getGrille()[x][y]).aUnRadis()) d += 4;
                         }
                         
     
@@ -211,7 +209,9 @@ public class VueControleurGyromite extends JFrame implements Observer {
             chargerIcone("Images/Entites/ennemi_left.png"),
             chargerIcone("Images/Entites/ennemi_right.png"),
             chargerIcone("Images/Entites/Corde/ennemi_left_dc.png"),
-            chargerIcone("Images/Entites/Corde/ennemi_right_dc.png")
+            chargerIcone("Images/Entites/Corde/ennemi_right_dc.png"),
+            chargerIcone("Images/Entites/radis_ennemis/ennemi_radis_left.png"),
+            chargerIcone("Images/Entites/radis_ennemis/ennemi_radis_right.png")
         };
         icoRadis = chargerIcone("Images/Entites/radis.png");
         death = new ImageIcon[]{

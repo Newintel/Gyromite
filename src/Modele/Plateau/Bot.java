@@ -3,6 +3,7 @@ package Modele.Plateau;
 import Modele.Deplacements.Gravite;
 
 public class Bot extends Personnage {
+    private EntiteDynamique target;
 
     public Bot(Jeu _jeu){
         super(_jeu);
@@ -15,9 +16,11 @@ public class Bot extends Personnage {
         radis = true;
     }
 
-    public void taperHeros(){
-        if (!radis){
+    public void setTarget(EntiteDynamique t){
+        target = t;
+    }
 
-        }
+    public EntiteDynamique getTarget(){
+        return target;
     }
 }

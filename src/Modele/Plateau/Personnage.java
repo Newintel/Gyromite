@@ -8,6 +8,8 @@ public abstract class Personnage extends EntiteDynamique {
     private boolean corde = false;
     private Radis radisSurLeChemin;
     protected boolean radis = false;
+    private boolean botBehind;
+    private Bot b;
 
     public Personnage(Jeu _jeu){
         super(_jeu);
@@ -31,4 +33,13 @@ public abstract class Personnage extends EntiteDynamique {
     public boolean aUnRadisSurLeChemin(){ return radisSurLeChemin != null; }
     public Radis getRadisSurLeChemin(){ return radisSurLeChemin; }
     public void setRadisSurLeChemin(Radis radis){ radisSurLeChemin = radis; }
+
+    public void passeDevantUnBot(Bot _b){
+        botBehind = !botBehind;
+        b = _b;
+    }
+    public Bot getBot(){
+        return b;
+    }
+    public boolean devantUnBot(){ return botBehind; }
 }
