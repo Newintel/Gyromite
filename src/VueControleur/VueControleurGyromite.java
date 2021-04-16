@@ -110,7 +110,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
     }
 
     private void mettreAJourAffichage(){
-        if (jeu.getTime() == -10){
+        if (jeu.getTime() == 0){
             dispose();
         }
         tabJPanneau[0].setText("<html><b>Score : " + jeu.getHector().getScore() + "</b></html>");
@@ -159,7 +159,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
                 } else if (!jeu.won()){
                     tabJLabel[x][y].setBackground(Color.BLACK);
                     if (x == 10 && y == 10){
-                        tabJLabel[x][y].setIcon(death[jeu.getDeath() == null ? 2 : (jeu.getDeath() == Direction.droite ? 1 : 0)]);
+                        tabJLabel[x][y].setIcon(death[jeu.getDeath() == null ? 2 : (jeu.getDeath() == Direction.droite ? 0 : 1)]);
                     } else tabJLabel[x][y].setIcon(null);
                 }
             }

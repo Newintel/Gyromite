@@ -213,8 +213,8 @@ public class Jeu {
             } else if (perso instanceof Heros){
                 fin = true;
             }
-        } else if (perso instanceof Bot && objet instanceof Heros || perso instanceof Heros && objet instanceof Bot){
-            death = ((Bot) (perso instanceof Bot ? perso : objet)).vaADroite() ? Direction.droite : Direction.gauche;
+        } else if (perso instanceof Personnage && objet instanceof Personnage){
+            death = ((Personnage) (objet)).vaADroite() ? Direction.droite : Direction.gauche;
             fin = true;
             System.out.println("ded");
         }
@@ -234,11 +234,17 @@ public class Jeu {
 
         if (contenuDansGrille(pCible)){
 
-            if (eCible instanceof Personnage && e instanceof Colonne && regarderDansLaDirection(eCible, d) != null && regarderDansLaDirection(eCible, d).peutServirDeSupport()){
+            if (
+                eCible instanceof Personnage &&
+                (
+                    e instanceof Colonne && regarderDansLaDirection(eCible, d) != null && regarderDansLaDirection(eCible, d).peutServirDeSupport()
+                    || e instanceof Personnage
+                )
+            ){
                 collision((Personnage) eCible, e);
             }
-
-            if (eCible == null || !eCible.peutServirDeSupport() || eCible.peutEtreEcrase() || eCible.peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
+            if (eCible instanceof Dynamite && e instanceof Heros) ret = true;
+            else if (eCible == null || !eCible.peutServirDeSupport() || eCible.peutEtreEcrase() || eCible.peutPermettreDeMonterDescendre()){ // TODO: penser aux collisions
                 switch (d){
                     case haut:
                     case bas:
@@ -420,8 +426,6 @@ public class Jeu {
         } else if (time > 0){
             time--;
             hector.addPts(100);
-        } else if (time == 0){
-            time = -10;
         }
     }
 

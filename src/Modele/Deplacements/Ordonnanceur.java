@@ -35,6 +35,13 @@ public class Ordonnanceur extends Observable implements Runnable {
             jeu.resetCmptDepl();
             turn = (turn + 1) % (int)(1000 / pause);
             jeu.updateTime();
+            if (jeu.getTime() == 0){
+                try {
+                    sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             
             if (jeu.estFini()){
                 jeu.updateScoreFinal();
