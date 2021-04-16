@@ -25,6 +25,7 @@ public class Jeu {
     private HashMap<String, ArrayList<ArrayList<Integer>>> gameMap;
 
     private Heros hector;
+    private ArrayList<Radis> radis;
 
     private HashMap<Entite, Point> map = new  HashMap<Entite, Point>(); // permet de récupérer la position d'une entité à partir de sa référence
     private Entite[][] grilleEntites = new Entite[SIZE_X][SIZE_Y]; // permet de récupérer une entité à partir de ses coordonnées
@@ -59,7 +60,6 @@ public class Jeu {
         addEntite(hector, x, y);
         Gravite.getInstance().addEntiteDynamique(hector);
         Controle4Directions.getInstance().addEntiteDynamique(hector);
-        System.out.println("yaaas");
     }
 
     private void addCorde(ArrayList<Integer> l){
@@ -122,6 +122,7 @@ public class Jeu {
         Radis r = new Radis(this);
         Gravite.getInstance().addEntiteDynamique(r);
         addEntite(r, x, y);
+        radis.add(r);
     }
 
     private void addHolder(ArrayList<Integer> l){
@@ -216,7 +217,6 @@ public class Jeu {
         } else if (perso instanceof Personnage && objet instanceof Personnage){
             death = ((Personnage) (objet)).vaADroite() ? Direction.droite : Direction.gauche;
             fin = true;
-            System.out.println("ded");
         }
     }
 
@@ -358,7 +358,6 @@ public class Jeu {
             if (perso.monteOuDescend() && perso.estDevantLaCorde()){
                 perso.passeDevantLaCorde();
             }
-            if (e instanceof Heros) System.out.println(map.get(e).x + " " + map.get(e).y);
         }
 
         return ret;
@@ -391,8 +390,8 @@ public class Jeu {
         return hector;
     }
 
-    public Point getPositionHector(){
-        return map.get(hector);
+    public Point getPosition(Entite e){
+        return map.get(e);
     }
 
     public void start(long _pause){
@@ -435,5 +434,9 @@ public class Jeu {
 
     public boolean won(){
         return won;
+    }
+
+    public ArrayList<Radis> getRadis(){
+        return radis;
     }
 }
