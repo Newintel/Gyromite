@@ -2,7 +2,11 @@ package Modele.Plateau;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.awt.Point;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import Modele.Deplacements.*;
 
 public class Jeu {
@@ -11,10 +15,14 @@ public class Jeu {
     private boolean fin;
     private int time = 120;
     private int nbDyn;
+    private Direction death = null;
+    private boolean won;
 
     // compteur de déplacements horizontal et vertical (1 max par défaut, à chaque pas de temps)
     private HashMap<Entite, Integer> cmptDeplH = new HashMap<Entite, Integer>();
     private HashMap<Entite, Integer> cmptDeplV = new HashMap<Entite, Integer>();
+
+    private HashMap<String, ArrayList<ArrayList<Integer>>> gameMap;
 
     private Heros hector;
 
@@ -26,9 +34,13 @@ public class Jeu {
 
     private Ordonnanceur ordonnanceur = new Ordonnanceur(this);
 
-    public Jeu(){
+    public Jeu(HashMap<String, ArrayList<ArrayList<Integer>>> gMap){
+        gameMap = gMap;
         initialisationDesEntites();
     }
+    // public Jeu(){
+    //     initialisationDesEntites();
+    // }
 
     public void resetCmptDepl() {
         cmptDeplH.clear();
@@ -40,7 +52,20 @@ public class Jeu {
         map.put(e, new Point(x, y));
     }
 
-    private void addCorde(int x, int yd, int ye){
+    private void addPlayer(ArrayList<Integer> l){
+        int x = l.get(0);
+        int y = l.get(1);
+        hector = new Heros(this);
+        addEntite(hector, x, y);
+        Gravite.getInstance().addEntiteDynamique(hector);
+        Controle4Directions.getInstance().addEntiteDynamique(hector);
+        System.out.println("yaaas");
+    }
+
+    private void addCorde(ArrayList<Integer> l){
+        int x = l.get(0);
+        int yd = l.get(1);
+        int ye = l.get(2);
         for (int i = yd; i <= ye; i++){
             addEntite(new Corde(this), x, i);
         }
@@ -58,7 +83,11 @@ public class Jeu {
         }
     }
 
-    private void addColonne(int x, int yd, int ye, boolean estBleue){
+    private void addColonne(ArrayList<Integer> l){
+        int x = l.get(0);
+        int yd = l.get(1);
+        int ye = l.get(2);
+        boolean estBleue = l.get(3) == 1;
         ArrayList<Colonne> c = new ArrayList<Colonne>();
         for (int i = yd; i <= ye; i++){
             Colonne toAdd = new Colonne(this, estBleue, i == yd || i == ye);
@@ -69,35 +98,76 @@ public class Jeu {
         a.addEntiteDynamique(c);
     }
 
-    private void initialisationDesEntites() {
-        
-        hector = new Heros(this);
-        addEntite(hector, 15, 15);
-        Gravite.getInstance().addEntiteDynamique(hector);
-        Controle4Directions.getInstance().addEntiteDynamique(hector);
+    private void addMur(ArrayList<Integer> l){
+        int c = l.get(0);
+        int start = l.get(1);
+        int end = l.get(2);
+        boolean v = l.get(3) == 1;
+        for (int i = start; i <= end; i++){
+            addEntite(new Mur(this, v), v ? c : i, v ? i : c);
+        }
+    }
 
-        addContour();
-        
-        addColonne(10, 4, 12, false);
-        addEntite(new Mur(this), 10, 1);
-        
-        addEntite(new Holder(this, false), 9, 10);
+    private void addBot(ArrayList<Integer> l){
+        int x = l.get(0);
+        int y = l.get(1);
+        Bot b = new Bot(this);
+        Gravite.getInstance().addEntiteDynamique(b);
+        addEntite(b, x, y);
+    }
 
-        // addColonne(15, 3, 11, true);
-
-        addEntite(new Holder(this, true), 16, 10);
-        
-        addCorde(6, 2, 18);
-        addCorde(7, 2, 18);
-        
-        addEntite(new Mur(this, false), 5, 6);
-        
+    private void addRadis(ArrayList<Integer> l){
+        int x = l.get(0);
+        int y = l.get(1);
         Radis r = new Radis(this);
         Gravite.getInstance().addEntiteDynamique(r);
-        addEntite(r, 15, 2);
-        
-        addEntite(new Dynamite(this), 2, 15);
+        addEntite(r, x, y);
+    }
+
+    private void addHolder(ArrayList<Integer> l){
+        int x = l.get(0);
+        int y = l.get(1);
+        boolean droite = l.get(3) == 1;
+        Holder h = new Holder(this, droite);
+        addEntite(h, x, y);
+    }
+
+    private void addDynamite(ArrayList<Integer> l){
+        int x = l.get(0);
+        int y = l.get(1);
+        addEntite(new Dynamite(this), x, y);
         nbDyn++;
+    }
+
+    private void addEntity(String _name, ArrayList<Integer> l){
+        String[] f = _name.split("");
+        f[0] = f[0].toUpperCase();
+        String name = "add";
+        for (String s : f) name += s;
+        try{
+            Method method = getClass().getDeclaredMethod(name, ArrayList.class);
+            method.invoke(this, l);
+        } catch (SecurityException e) {
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void initialisationDesEntites() {
+        addContour();
+
+        for (String key : gameMap.keySet()){
+            for (ArrayList<Integer> l : gameMap.get(key)){
+                addEntity(key, l);
+            }
+        }
 
         ordonnanceur.add(Gravite.getInstance());
         ordonnanceur.add(cr);
@@ -135,21 +205,18 @@ public class Jeu {
     private void collision(EntiteDynamique perso, Entite objet){
         if (objet instanceof Colonne){
             Gravite.getInstance().removeEntiteDynamique(perso);
+            map.remove(perso);
             if (perso instanceof Bot){
                 hector.addPts(500);
             } else if (perso instanceof Radis){
                 hector.addPts(-50);
             } else if (perso instanceof Heros){
-                // TODO: fin du jeu
                 fin = true;
-                System.out.println("Ded");
             }
-        } else if (perso instanceof Bot){
-            if (objet instanceof Heros){
-                // TODO: fin du jeu
-                fin = true;
-                System.out.println("ded");
-            }
+        } else if (perso instanceof Bot && objet instanceof Heros || perso instanceof Heros && objet instanceof Bot){
+            death = ((Bot) (perso instanceof Bot ? perso : objet)).vaADroite() ? Direction.droite : Direction.gauche;
+            fin = true;
+            System.out.println("ded");
         }
     }
 
@@ -318,6 +385,10 @@ public class Jeu {
         return hector;
     }
 
+    public Point getPositionHector(){
+        return map.get(hector);
+    }
+
     public void start(long _pause){
         ordonnanceur.start(_pause);
     }
@@ -327,7 +398,10 @@ public class Jeu {
             if (ordonnanceur.getTurn() == 0) time--;
         } else {
             fin = true;
-            if (nbDyn != 0) time = 0;
+            if (nbDyn != 0){
+                won = false;
+                time = 0;
+            } else won = true;
         }
     }
 
@@ -346,8 +420,16 @@ public class Jeu {
         } else if (time > 0){
             time--;
             hector.addPts(100);
+        } else if (time == 0){
+            time = -10;
         }
     }
 
+    public Direction getDeath(){
+        return death;
+    }
 
+    public boolean won(){
+        return won;
+    }
 }

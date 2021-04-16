@@ -36,6 +36,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
     private ImageIcon[] icoHolder;
     private ImageIcon icoRadis;
     private ImageIcon icoDynamite;
+    private ImageIcon[] death;
 
     private JLabel[][] tabJLabel; // cases graphique (au moment du rafraichissement, chaque case va être associée à une icône, suivant ce qui est présent dans le modèle)
     private JLabel[] tabJPanneau;
@@ -60,7 +61,6 @@ public class VueControleurGyromite extends JFrame implements Observer {
         tabJPanneau = new JLabel[2];
 
         JLabel score = new JLabel("", 0);
-        score.setSize(18 * sizeX / 5, 20);
         score.setOpaque(true);
         score.setForeground(Color.WHITE);
         score.setBackground(Color.BLACK);
@@ -68,7 +68,6 @@ public class VueControleurGyromite extends JFrame implements Observer {
         tabJPanneau[0] = score;
 
         JLabel time = new JLabel("", 0);
-        time.setSize(18 * sizeX / 5, 20);
         time.setOpaque(true);
         time.setForeground(Color.WHITE);
         time.setBackground(Color.BLACK);
@@ -76,6 +75,7 @@ public class VueControleurGyromite extends JFrame implements Observer {
         tabJPanneau[1] = time;
 
         add(panneau, BorderLayout.NORTH);
+        
         JComponent grilleJLabels = new JPanel(new GridLayout(sizeY, sizeX)); // grilleJLabels va contenir les cases graphiques et les positionner sous la forme d'une grille
 
         tabJLabel = new JLabel[sizeX][sizeY];
@@ -110,52 +110,63 @@ public class VueControleurGyromite extends JFrame implements Observer {
     }
 
     private void mettreAJourAffichage(){
+        if (jeu.getTime() == -10){
+            dispose();
+        }
         tabJPanneau[0].setText("<html><b>Score : " + jeu.getHector().getScore() + "</b></html>");
         tabJPanneau[1].setText("<html><b>Time : " + jeu.getTime() + "</b></html>");
 
-        for (int x = 0; x < sizeX; x++)
+        for (int x = 0; x < sizeX; x++){
             for (int y = 0; y < sizeY; y++){
-                int d;
-                if (jeu.getGrille()[x][y] instanceof Personnage){
-                    d = 0;
-
-                    if (!((Personnage) jeu.getGrille()[x][y]).monteOuDescend()){
-                        d = ((Personnage) jeu.getGrille()[x][y]).vaADroite() ? 2 : 1;
-
-                        if (((Personnage) jeu.getGrille()[x][y]).estDevantLaCorde()) d += 2;
-
-                        if (jeu.getGrille()[x][y] instanceof Heros)
-                            if (((Heros) jeu.getGrille()[x][y]).aUnRadis())
-                                d += 4;
+                if (!jeu.estFini()){
+                    int d;
+                    if (jeu.getGrille()[x][y] instanceof Personnage){
+                        d = 0;
+    
+                        if (!((Personnage) jeu.getGrille()[x][y]).monteOuDescend()){
+                            d = ((Personnage) jeu.getGrille()[x][y]).vaADroite() ? 2 : 1;
+    
+                            if (((Personnage) jeu.getGrille()[x][y]).estDevantLaCorde()) d += 2;
+    
+                            if (jeu.getGrille()[x][y] instanceof Heros)
+                                if (((Heros) jeu.getGrille()[x][y]).aUnRadis())
+                                    d += 4;
+                        }
+                        
+    
+                        ImageIcon[] icones = jeu.getGrille()[x][y] instanceof Heros ? icoHero : icoBot;
+    
+                        tabJLabel[x][y].setIcon(icones[d]);
+                    } else if (jeu.getGrille()[x][y] instanceof Colonne){
+                        d = ((Colonne) jeu.getGrille()[x][y]).estBleue() ? 0 : 1;
+                        tabJLabel[x][y].setIcon(icoColonne[d]);
+                    } else if (jeu.getGrille()[x][y] instanceof Mur){
+                        if (((Mur) jeu.getGrille()[x][y]).estUneBrique()) d = 2;
+                        else d = ((Mur) jeu.getGrille()[x][y]).estVertical() ? 1 : 0;
+                        tabJLabel[x][y].setIcon(icoMur[d]);
+                    } else if (jeu.getGrille()[x][y] instanceof Corde){
+                        tabJLabel[x][y].setIcon(icoCorde);
+                    } else if (jeu.getGrille()[x][y] instanceof Holder){
+                        d = ((Holder) jeu.getGrille()[x][y]).droite() ? 1 : 0;
+                        tabJLabel[x][y].setIcon(icoHolder[d]);
+                    } else if (jeu.getGrille()[x][y] instanceof Dynamite){
+                        tabJLabel[x][y].setIcon(icoDynamite);
+                    } else if (jeu.getGrille()[x][y] instanceof Radis){
+                        tabJLabel[x][y].setIcon(icoRadis);
+                    } else {
+                        tabJLabel[x][y].setIcon(null);
                     }
-                    
-
-                    ImageIcon[] icones = jeu.getGrille()[x][y] instanceof Heros ? icoHero : icoBot;
-
-                    tabJLabel[x][y].setIcon(icones[d]);
-                } else if (jeu.getGrille()[x][y] instanceof Colonne){
-                    d = ((Colonne) jeu.getGrille()[x][y]).estBleue() ? 0 : 1;
-                    tabJLabel[x][y].setIcon(icoColonne[d]);
-                } else if (jeu.getGrille()[x][y] instanceof Mur){
-                    if (((Mur) jeu.getGrille()[x][y]).estUneBrique()) d = 2;
-                    else d = ((Mur) jeu.getGrille()[x][y]).estVertical() ? 1 : 0;
-                    tabJLabel[x][y].setIcon(icoMur[d]);
-                } else if (jeu.getGrille()[x][y] instanceof Corde){
-                    tabJLabel[x][y].setIcon(icoCorde);
-                } else if (jeu.getGrille()[x][y] instanceof Holder){
-                    d = ((Holder) jeu.getGrille()[x][y]).droite() ? 1 : 0;
-                    tabJLabel[x][y].setIcon(icoHolder[d]);
-                } else if (jeu.getGrille()[x][y] instanceof Dynamite){
-                    tabJLabel[x][y].setIcon(icoDynamite);
-                } else if (jeu.getGrille()[x][y] instanceof Radis){
-                    tabJLabel[x][y].setIcon(icoRadis);
-                } else {
-                    tabJLabel[x][y].setIcon(null);
+                } else if (!jeu.won()){
+                    tabJLabel[x][y].setBackground(Color.BLACK);
+                    if (x == 10 && y == 10){
+                        tabJLabel[x][y].setIcon(death[jeu.getDeath() == null ? 2 : (jeu.getDeath() == Direction.droite ? 1 : 0)]);
+                    } else tabJLabel[x][y].setIcon(null);
                 }
             }
+        }
     }
 
-    private ImageIcon chargerIcone(String urlIcone) {
+    protected static ImageIcon chargerIcone(String urlIcone) {
         BufferedImage image = null;
 
         try {
@@ -203,6 +214,11 @@ public class VueControleurGyromite extends JFrame implements Observer {
             chargerIcone("Images/Entites/Corde/ennemi_right_dc.png")
         };
         icoRadis = chargerIcone("Images/Entites/radis.png");
+        death = new ImageIcon[]{
+            chargerIcone("Images/Entites/collisions/collision_ennemi_left.png"),
+            chargerIcone("Images/Entites/collisions/collision_ennemi_right.png"),
+            chargerIcone("Images/Entites/collisions/dead.png")
+        };
     }
 
     @Override
