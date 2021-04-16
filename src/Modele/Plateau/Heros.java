@@ -22,7 +22,7 @@ public class Heros extends Personnage{
             radisDuHeros = getRadisSurLeChemin();
             radis = true;
             setRadisSurLeChemin(null);
-        } else if (radis && !estDevantLaCorde()){
+        } else if (radis && !estDevantLaCorde() && !aUnRadisSurLeChemin()){
             radis = false;
             setRadisSurLeChemin(radisDuHeros);
             radisDuHeros = null;

@@ -29,7 +29,6 @@ public class IA extends RealisateurDeDeplacements<Bot> {
                     if (jeu.deplacerEntite(b, d)){
                         ret = true;
                         if (b.aUnRadis()) removeEntiteDynamique(b);
-                        System.out.println(d);
                     }
                 }
             }
@@ -72,15 +71,19 @@ public class IA extends RealisateurDeDeplacements<Bot> {
 
     private ArrayList<Direction> getDirectionsPossibles(Bot b){
         ArrayList<Direction> ret = new ArrayList<Direction>();
+        ArrayList<Direction> toRem = new ArrayList<Direction>();
         ret.add(Direction.gauche);
         ret.add(Direction.droite);
 
         for (Direction d : ret){
             if (b.regarderDansLaDirection(d) != null){
                 if (b.regarderDansLaDirection(d).peutServirDeSupport()){
-                    ret.remove(d);
+                    toRem.add(d);
                 }
             }
+        }
+        for (Direction d : toRem){
+            ret.remove(d);
         }
 
         if (b.monteOuDescend() && b.regarderDansLaDirection(Direction.bas) != null){

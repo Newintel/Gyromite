@@ -284,6 +284,10 @@ public class Jeu {
                                     ret = true;
                                 } else if (eCible == null || !eCible.peutServirDeSupport()){
                                     ret = d == Direction.bas || eBas instanceof Colonne && cmptDeplV.get(eBas) != null;
+                                    if (perso.monteOuDescend()){
+                                        perso.sePoseOuMonte();
+                                        remettreCorde = true;
+                                    }
                                 }
                                 if (eCible instanceof Radis){
                                     perso.setRadisSurLeChemin((Radis) eCible);
@@ -350,7 +354,7 @@ public class Jeu {
 
         if (ret){
             
-            if (e instanceof Heros && ObjetALaPosition(pCible) instanceof Dynamite){
+            if (e instanceof Heros && eCible instanceof Dynamite){
                 ((Heros) e).attraperDynamite();
                 nbDyn--;
             }
